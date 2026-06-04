@@ -1,0 +1,27 @@
+# --- Environment & Secrets (NEVER COMMITTED) ---
+.env
+.env.local
+.env.*.local
+*.env
+config.json
+*.pem
+*.key
+
+# --- Node.js / Express / NestJS ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+dist/
+build/
+.nestjs/
+.strapi/
+
+# --- Databases (Local data dumps) ---
+*.db
+*.sqlite3
+.data/
+postgres-data/
+mongo-data/
