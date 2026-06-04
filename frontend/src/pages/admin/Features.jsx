@@ -1,56 +1,25 @@
+import { useEffect, useState } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
+import { getFeatures } from "../../services/featureService";
 
 function Features() {
-  const features = [
-    {
-      name: "Authentication",
-      cost: 15000,
-      time: 3,
-      complexity: 5,
-    },
-    {
-      name: "Admin Panel",
-      cost: 25000,
-      time: 5,
-      complexity: 8,
-    },
-    {
-      name: "Database Integration",
-      cost: 20000,
-      time: 4,
-      complexity: 6,
-    },
-    {
-      name: "Payment Gateway",
-      cost: 20000,
-      time: 4,
-      complexity: 7,
-    },
-    {
-      name: "API Integration",
-      cost: 15000,
-      time: 3,
-      complexity: 5,
-    },
-    {
-      name: "AI Features",
-      cost: 50000,
-      time: 10,
-      complexity: 15,
-    },
-    {
-      name: "Real-time Chat",
-      cost: 30000,
-      time: 6,
-      complexity: 10,
-    },
-    {
-      name: "Analytics Dashboard",
-      cost: 25000,
-      time: 5,
-      complexity: 8,
-    },
-  ];
+  const [features, setFeatures] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeatures = async () => {
+      try {
+        const data = await getFeatures();
+        setFeatures(data);
+      } catch (error) {
+        console.error("Error fetching features:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeatures();
+  }, []);
 
   return (
     <AdminLayout>
@@ -65,66 +34,83 @@ function Features() {
       </div>
 
       <div className="bg-white rounded-xl border overflow-hidden shadow-sm">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="text-left p-4 font-semibold">
-                Name
-              </th>
+        {loading ? (
+          <div className="p-6">
+            Loading Features...
+          </div>
+        ) : (
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="text-left p-4 font-semibold">
+                  Name
+                </th>
 
-              <th className="text-left p-4 font-semibold">
-                Cost
-              </th>
+                <th className="text-left p-4 font-semibold">
+                  Cost
+                </th>
 
-              <th className="text-left p-4 font-semibold">
-                Time
-              </th>
+                <th className="text-left p-4 font-semibold">
+                  Days
+                </th>
 
-              <th className="text-left p-4 font-semibold">
-                Complexity
-              </th>
+                <th className="text-left p-4 font-semibold">
+                  Complexity
+                </th>
 
-              <th className="text-left p-4 font-semibold">
-                Actions
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {features.map((feature, index) => (
-              <tr
-                key={index}
-                className="border-t hover:bg-gray-50"
-              >
-                <td className="p-4">
-                  {feature.name}
-                </td>
-
-                <td className="p-4">
-                  ₹{feature.cost.toLocaleString()}
-                </td>
-
-                <td className="p-4">
-                  {feature.time} Days
-                </td>
-
-                <td className="p-4">
-                  {feature.complexity}
-                </td>
-
-                <td className="p-4">
-                  <button className="text-blue-600 mr-4 hover:underline">
-                    Edit
-                  </button>
-
-                  <button className="text-red-500 hover:underline">
-                    Delete
-                  </button>
-                </td>
+                <th className="text-left p-4 font-semibold">
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {features.map((feature) => (
+                <tr
+                  key={feature._id}
+                  className="border-t hover:bg-gray-50"
+                >
+                  <td className="p-4">
+                    {feature.name}
+                  </td>
+
+                  <td className="p-4">
+                    ₹{feature.cost.toLocaleString()}
+                  </td>
+
+                  <td className="p-4">
+                    {feature.days} Days
+                  </td>
+
+                  <td className="p-4">
+                    {feature.complexity}
+                  </td>
+
+                  <td className="p-4">
+                    <button className="text-blue-600 mr-4 hover:underline">
+                      Edit
+                    </button>
+
+                    <button className="text-red-500 hover:underline">
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+
+              {features.length === 0 && (
+                <tr>
+                  <td
+                    colSpan="5"
+                    className="p-6 text-center text-gray-500"
+                  >
+                    No Features Found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
     </AdminLayout>
   );
