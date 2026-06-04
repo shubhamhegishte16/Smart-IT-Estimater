@@ -1,33 +1,25 @@
+import { useEffect, useState } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
+import { getProjectTypes } from "../../services/projectTypeService";
 
 function ProjectTypes() {
-  const projectTypes = [
-    {
-      name: "Website",
-      baseCost: 20000,
-      baseDays: 7,
-    },
-    {
-      name: "Web Application",
-      baseCost: 50000,
-      baseDays: 15,
-    },
-    {
-      name: "Mobile App",
-      baseCost: 70000,
-      baseDays: 20,
-    },
-    {
-      name: "E-Commerce",
-      baseCost: 80000,
-      baseDays: 25,
-    },
-    {
-      name: "Custom Software",
-      baseCost: 100000,
-      baseDays: 30,
-    },
-  ];
+  const [projectTypes, setProjectTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProjectTypes = async () => {
+      try {
+        const data = await getProjectTypes();
+        setProjectTypes(data);
+      } catch (error) {
+        console.error("Error fetching project types:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjectTypes();
+  }, []);
 
   return (
     <AdminLayout>
@@ -42,58 +34,75 @@ function ProjectTypes() {
       </div>
 
       <div className="bg-white rounded-xl border overflow-hidden shadow-sm">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="text-left p-4 font-semibold">
-                Name
-              </th>
+        {loading ? (
+          <div className="p-6">
+            Loading Project Types...
+          </div>
+        ) : (
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="text-left p-4 font-semibold">
+                  Name
+                </th>
 
-              <th className="text-left p-4 font-semibold">
-                Base Cost
-              </th>
+                <th className="text-left p-4 font-semibold">
+                  Base Cost
+                </th>
 
-              <th className="text-left p-4 font-semibold">
-                Base Days
-              </th>
+                <th className="text-left p-4 font-semibold">
+                  Base Days
+                </th>
 
-              <th className="text-left p-4 font-semibold">
-                Actions
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {projectTypes.map((type, index) => (
-              <tr
-                key={index}
-                className="border-t hover:bg-gray-50"
-              >
-                <td className="p-4">
-                  {type.name}
-                </td>
-
-                <td className="p-4">
-                  ₹{type.baseCost.toLocaleString()}
-                </td>
-
-                <td className="p-4">
-                  {type.baseDays} Days
-                </td>
-
-                <td className="p-4">
-                  <button className="text-blue-600 mr-4 hover:underline">
-                    Edit
-                  </button>
-
-                  <button className="text-red-500 hover:underline">
-                    Delete
-                  </button>
-                </td>
+                <th className="text-left p-4 font-semibold">
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody>
+              {projectTypes.map((type) => (
+                <tr
+                  key={type._id}
+                  className="border-t hover:bg-gray-50"
+                >
+                  <td className="p-4">
+                    {type.name}
+                  </td>
+
+                  <td className="p-4">
+                    ₹{type.baseCost.toLocaleString()}
+                  </td>
+
+                  <td className="p-4">
+                    {type.baseDays} Days
+                  </td>
+
+                  <td className="p-4">
+                    <button className="text-blue-600 mr-4 hover:underline">
+                      Edit
+                    </button>
+
+                    <button className="text-red-500 hover:underline">
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+
+              {projectTypes.length === 0 && (
+                <tr>
+                  <td
+                    colSpan="4"
+                    className="text-center p-6 text-gray-500"
+                  >
+                    No Project Types Found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
     </AdminLayout>
   );
