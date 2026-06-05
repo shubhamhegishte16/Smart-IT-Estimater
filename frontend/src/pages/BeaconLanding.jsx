@@ -67,64 +67,142 @@ function FadeIn({ children, delay = 0, className = "", style = {} }) {
 }
 
 // ─── NAVBAR ───────────────────────────────────────────────────────────────────
-function Navbar({ onNavigate }) {
+function Navbar({ onLogin, onSignup }) {
   const [scrolled, setScrolled] = useState(false);
+
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", fn, { passive: true });
+
     return () => window.removeEventListener("scroll", fn);
   }, []);
 
   return (
-    <nav style={{
-      position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000,
-      background: scrolled ? "rgba(255,255,255,0.92)" : "transparent",
-      backdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
-      borderBottom: scrolled ? "1px solid #E5E5E5" : "none",
-      transition: "all 0.4s ease",
-    }}>
-      <div style={{
-        maxWidth: "100%",
-        padding: "0 48px",
-        height: 68,
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-      }}>
+    <nav
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1000,
+        background: scrolled
+          ? "rgba(255,255,255,0.92)"
+          : "transparent",
+        backdropFilter: scrolled
+          ? "blur(20px) saturate(180%)"
+          : "none",
+        borderBottom: scrolled
+          ? "1px solid #E5E5E5"
+          : "none",
+        transition: "all 0.4s ease",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: "100%",
+          padding: "0 48px",
+          height: 68,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
         {/* Logo */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <img src={BEACON_LOGO} alt="Beacon" style={{ height: 38, width: "auto" }} />
-          <span style={{
-            fontFamily: "'DM Sans', 'Outfit', sans-serif",
-            fontSize: 20, fontWeight: 800, color: "#0A0A0A", letterSpacing: "-0.5px",
-          }}>Beacon</span>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <img
+            src={BEACON_LOGO}
+            alt="Beacon"
+            style={{
+              height: 38,
+              width: "auto",
+            }}
+          />
+
+          <span
+            style={{
+              fontFamily: "'DM Sans', 'Outfit', sans-serif",
+              fontSize: 20,
+              fontWeight: 800,
+              color: "#0A0A0A",
+              letterSpacing: "-0.5px",
+            }}
+          >
+            Beacon
+          </span>
         </div>
 
-        {/* Nav right */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        {/* Right Side */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          {/* LOGIN */}
           <button
-            onClick={onNavigate}
+            onClick={onLogin}
             style={{
-              padding: "9px 22px", borderRadius: 8,
-              border: "none", background: "transparent",
-              color: "#0A0A0A", fontSize: 14, fontWeight: 500,
+              padding: "9px 22px",
+              borderRadius: 8,
+              border: "none",
+              background: "transparent",
+              color: "#0A0A0A",
+              fontSize: 14,
+              fontWeight: 500,
               fontFamily: "'DM Sans', sans-serif",
-              cursor: "pointer", transition: "all 0.2s",
+              cursor: "pointer",
+              transition: "all 0.2s",
             }}
-            onMouseEnter={e => e.currentTarget.style.background = "#F5F5F5"}
-            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-          >Log in</button>
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.background =
+                "#F5F5F5")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.background =
+                "transparent")
+            }
+          >
+            Log in
+          </button>
+
+          {/* SIGNUP */}
           <button
-            onClick={onNavigate}
+            onClick={onSignup}
             style={{
-              padding: "9px 22px", borderRadius: 8,
-              border: "none", background: "#0A0A0A",
-              color: "#ffffff", fontSize: 14, fontWeight: 600,
+              padding: "9px 22px",
+              borderRadius: 8,
+              border: "none",
+              background: "#0A0A0A",
+              color: "#ffffff",
+              fontSize: 14,
+              fontWeight: 600,
               fontFamily: "'DM Sans', sans-serif",
-              cursor: "pointer", transition: "all 0.2s",
+              cursor: "pointer",
+              transition: "all 0.2s",
               letterSpacing: "-0.1px",
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#2A2A2A"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "#0A0A0A"; e.currentTarget.style.transform = "translateY(0)"; }}
-          >Sign Up</button>
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background =
+                "#2A2A2A";
+              e.currentTarget.style.transform =
+                "translateY(-1px)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background =
+                "#0A0A0A";
+              e.currentTarget.style.transform =
+                "translateY(0)";
+            }}
+          >
+            Sign Up
+          </button>
         </div>
       </div>
     </nav>

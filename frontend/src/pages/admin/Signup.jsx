@@ -30,7 +30,7 @@ function Signup() {
       return;
     }
 
-    navigate("/admin/login");
+    navigate("/login");
   };
 
   return (
@@ -124,7 +124,7 @@ function Signup() {
 
             <p className="mt-8 text-center text-sm text-black/50">
               Already have an account?{" "}
-              <Link className="font-bold text-black hover:underline" to="/admin/login">
+              <Link className="font-bold text-black hover:underline" to="/login">
                 Sign in
               </Link>
             </p>
