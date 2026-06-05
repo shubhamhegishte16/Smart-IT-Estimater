@@ -1,7 +1,7 @@
-import AppRoutes from "./routes/AppRoutes";
+import BeaconLanding from "./BeaconLanding";
 
 function App() {
-  return <AppRoutes />;
+  return <BeaconLanding />;
 }
 
 export default App;
