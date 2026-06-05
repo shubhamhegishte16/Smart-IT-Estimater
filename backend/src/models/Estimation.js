@@ -35,5 +35,6 @@ const estimationSchema = new mongoose.Schema({
 
 export default mongoose.model(
     "Estimation",
-    estimationSchema
+    estimationSchema,
+    "Estimations"
 );

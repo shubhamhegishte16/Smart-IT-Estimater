@@ -3,9 +3,7 @@ import Feature from "../models/Feature.js";
 import ProjectType from "../models/ProjectType.js";
 
 export const createEstimation = async (req, res) => {
-
     try {
-
         const {
             clientName,
             clientEmail,
@@ -13,13 +11,17 @@ export const createEstimation = async (req, res) => {
             featureIds
         } = req.body;
 
-        const projectType =
-            await ProjectType.findById(projectTypeId);
+        const projectType = await ProjectType.findById(projectTypeId);
 
-        const features =
-            await Feature.find({
-                _id: { $in: featureIds }
+        if (!projectType) {
+            return res.status(404).json({
+                message: "Project Type not found"
             });
+        }
+
+        const features = await Feature.find({
+            _id: { $in: featureIds }
+        });
 
         let totalCost = projectType.baseCost;
         let totalDays = projectType.baseDays;
@@ -37,21 +39,65 @@ export const createEstimation = async (req, res) => {
         if (totalCost > 100000)
             complexity = "High";
 
-        const estimation =
-            await Estimation.create({
-                clientName,
-                clientEmail,
-                projectType: projectTypeId,
-                features: featureIds,
-                totalCost,
-                totalDays,
-                complexity
-            });
+        // Recommended Stack
+        let recommendedStack = [];
+
+        switch (projectType.name.toLowerCase()) {
+            case "website":
+                recommendedStack = [
+                    "React",
+                    "Node.js",
+                    "MongoDB"
+                ];
+                break;
+
+            case "web application":
+                recommendedStack = [
+                    "React",
+                    "Express.js",
+                    "MongoDB"
+                ];
+                break;
+
+            case "mobile application":
+                recommendedStack = [
+                    "Flutter",
+                    "Node.js",
+                    "MongoDB"
+                ];
+                break;
+
+            case "e-commerce":
+                recommendedStack = [
+                    "React",
+                    "Node.js",
+                    "MongoDB",
+                    "Razorpay"
+                ];
+                break;
+
+            default:
+                recommendedStack = [
+                    "React",
+                    "Node.js",
+                    "MongoDB"
+                ];
+        }
+
+        const estimation = await Estimation.create({
+            clientName,
+            clientEmail,
+            projectType: projectTypeId,
+            features: featureIds,
+            totalCost,
+            totalDays,
+            complexity,
+            recommendedStack
+        });
 
         res.status(201).json(estimation);
 
     } catch (error) {
-
         res.status(500).json({
             message: error.message
         });
@@ -59,12 +105,60 @@ export const createEstimation = async (req, res) => {
 };
 
 export const getEstimations = async (req, res) => {
-
-    const estimations =
-        await Estimation.find()
+    try {
+        const estimations = await Estimation.find()
             .populate("projectType")
             .populate("features");
 
-    res.json(estimations);
+        res.status(200).json(estimations);
+
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
 };
 
+export const getEstimationById = async (req, res) => {
+    try {
+        const estimation = await Estimation.findById(req.params.id)
+            .populate("projectType")
+            .populate("features");
+
+        if (!estimation) {
+            return res.status(404).json({
+                message: "Estimation not found"
+            });
+        }
+
+        res.status(200).json(estimation);
+
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};
+
+export const deleteEstimation = async (req, res) => {
+    try {
+        const estimation = await Estimation.findByIdAndDelete(
+            req.params.id
+        );
+
+        if (!estimation) {
+            return res.status(404).json({
+                message: "Estimation not found"
+            });
+        }
+
+        res.status(200).json({
+            message: "Estimation deleted successfully"
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};

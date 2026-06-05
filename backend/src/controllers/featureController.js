@@ -16,8 +16,6 @@ export const getFeatures = async (req, res) => {
     try {
         const features = await Feature.find();
 
-        console.log("Count:", features.length);
-
         res.json(features);
     } catch (error) {
         res.status(500).json({
