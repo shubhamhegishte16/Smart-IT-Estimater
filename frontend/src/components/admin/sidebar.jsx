@@ -6,11 +6,18 @@ function Sidebar() {
 
       <div className="p-6 border-b">
         <h1 className="text-xl font-bold text-blue-600">
-          Smart IT
+          Beacon.
         </h1>
       </div>
 
       <nav className="flex flex-col p-4 gap-2">
+
+        <Link
+          className="px-4 py-3 rounded-lg hover:bg-gray-100"
+          to="/"
+        >
+          Landing Page
+        </Link>
 
         <Link
           className="px-4 py-3 rounded-lg hover:bg-gray-100"
