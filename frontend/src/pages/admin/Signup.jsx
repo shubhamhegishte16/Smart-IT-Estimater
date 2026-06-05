@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+// import { registerUser } from "../../services/authService.js";
+import { registerUser } from "../../../../backend/src/services/authService.js";
 
 function Signup() {
   const navigate = useNavigate();
@@ -8,6 +10,7 @@ function Signup() {
     email: "",
     password: "",
     confirmPassword: "",
+    role: "client"
   });
   const [error, setError] = useState("");
 
@@ -16,8 +19,9 @@ function Signup() {
     setForm((current) => ({ ...current, [name]: value }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+
     setError("");
 
     if (form.password.length < 6) {
@@ -30,7 +34,25 @@ function Signup() {
       return;
     }
 
-    navigate("/login");
+    try {
+
+      await registerUser(
+        form.name,
+        form.email,
+        form.password,
+        form.role
+      );
+
+      navigate("/login");
+
+    } catch (error) {
+
+      setError(
+        error.message ||
+        "Registration failed"
+      );
+
+    }
   };
 
   return (
@@ -78,6 +100,22 @@ function Signup() {
                   placeholder="you@company.com"
                   required
                 />
+              </label>
+
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-black/70">
+                  Role
+                </span>
+
+                <select
+                  className="h-12 w-full rounded-xl border border-black/10 bg-white px-4 text-sm"
+                  name="role"
+                  value={form.role}
+                  onChange={updateField}
+                >
+                  <option value="client">Client</option>
+                  <option value="admin">Admin</option>
+                </select>
               </label>
 
               <div className="grid gap-5 sm:grid-cols-2">

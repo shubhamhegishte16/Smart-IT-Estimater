@@ -5,7 +5,13 @@ import { loginUser } from "../../services/authService";
 
 function Login() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "", remember: true });
+
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    remember: true
+  });
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -19,15 +25,37 @@ function Login() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     setError("");
     setLoading(true);
 
     try {
-      const data = await loginUser(form.email, form.password);
-      if (data?.token) localStorage.setItem("token", data.token);
-      navigate("/admin/dashboard");
-    } catch {
-      setError("Sign in failed. Please check your email, password, or backend connection.");
+      const data = await loginUser(
+        form.email,
+        form.password
+      );
+
+      localStorage.setItem(
+        "token",
+        data.token
+      );
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(data.user)
+      );
+
+      if (data.user.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/client/dashboard");
+      }
+
+    } catch (error) {
+      setError(
+        error.message ||
+        "Sign in failed. Please check your credentials."
+      );
     } finally {
       setLoading(false);
     }
@@ -83,6 +111,7 @@ function Login() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
+
               <label className="block">
                 <span className="mb-2 block text-sm font-semibold text-black/70">Email address</span>
                 <input
@@ -154,5 +183,3 @@ function Login() {
 }
 
 export default Login;
-
-

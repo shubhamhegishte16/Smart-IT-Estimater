@@ -12,6 +12,10 @@ import Estimations from "./pages/admin/Estimations";
 import Settings from "./pages/admin/Settings";
 import Pricing from "./pages/admin/Pricing";
 
+import ProtectedRoute from "./components/ProtectedRoutes.jsx";
+import AdminRoute from "./components/AdminRoute.jsx";
+import ClientRoute from "./components/ClientRoute.jsx";
+
 function LandingWrapper() {
   const navigate = useNavigate();
 
