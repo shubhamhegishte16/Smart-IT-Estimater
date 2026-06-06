@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-// import { registerUser } from "../../services/authService.js";
 import { registerUser } from "../../../../backend/src/services/authService.js";
 
 function Signup() {
@@ -114,7 +113,6 @@ function Signup() {
                   onChange={updateField}
                 >
                   <option value="client">Client</option>
-                  <option value="admin">Admin</option>
                 </select>
               </label>
 

@@ -14,10 +14,16 @@ export const createFeature = async (req, res) => {
 
 export const getFeatures = async (req, res) => {
     try {
+        console.log("GET FEATURES HIT");
+
         const features = await Feature.find();
+
+        console.log(features);
 
         res.json(features);
     } catch (error) {
+        console.log(error);
+
         res.status(500).json({
             message: error.message
         });

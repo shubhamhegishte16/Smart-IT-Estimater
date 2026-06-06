@@ -12,10 +12,10 @@ const router = express.Router();
 
 router.get("/", getFeatures);
 
-router.post("/", authMiddleware, createFeature);
+router.post("/", createFeature);
 
-router.put("/:id", authMiddleware, updateFeature);
+router.put("/:id", updateFeature);
 
-router.delete("/:id", authMiddleware, deleteFeature);
+router.delete("/:id", deleteFeature);
 
 export default router;
