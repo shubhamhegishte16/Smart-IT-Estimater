@@ -16,6 +16,10 @@ import ProtectedRoute from "./components/ProtectedRoutes.jsx";
 import AdminRoute from "./components/AdminRoute.jsx";
 import ClientRoute from "./components/ClientRoute.jsx";
 
+/* ✅ ADD THESE TWO IMPORTS */
+import EstimationPage from "./pages/main/Estimation";
+import ResultsPage from "./pages/main/Results.jsx";
+
 function LandingWrapper() {
   const navigate = useNavigate();
 
@@ -40,6 +44,10 @@ function App() {
       <Route path="/admin/estimations" element={<Estimations />} />
       <Route path="/admin/settings" element={<Settings />} />
       <Route path="/admin/pricing" element={<Pricing />} />
+
+      {/* ✅ NEW ROUTES ADDED */}
+      <Route path="/estimations" element={<EstimationPage />} />
+      <Route path="/results" element={<ResultsPage />} />
     </Routes>
   );
 }
