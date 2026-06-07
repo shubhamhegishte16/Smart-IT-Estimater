@@ -190,7 +190,7 @@ function Features() {
                     </span>
                   </td>
                   <td className="p-4 align-middle font-medium text-[#0D1B15]">
-                    ${feature.cost?.toLocaleString() || "0"}
+                    Rs {feature.cost?.toLocaleString() || "0"}
                   </td>
                   <td className="p-4 align-middle text-[#0D1B15]">{feature.weeks || 1}</td>
                   <td className="p-4 align-middle text-[#0D1B15]">{feature.complexity || 1}</td>
