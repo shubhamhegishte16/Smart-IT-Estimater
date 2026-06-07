@@ -171,7 +171,7 @@ function Login() {
 
             <p className="mt-8 text-center text-sm text-black/50">
               New to Beacon?{" "}
-              <Link className="font-bold text-black hover:underline" to="/admin/signup">
+              <Link className="font-bold text-black hover:underline" to="/signup">
                 Create an account
               </Link>
             </p>
