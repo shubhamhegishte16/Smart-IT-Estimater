@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   CalendarDays,
   CheckCircle2,
+  Download,
   Layers,
   Wallet,
 } from "lucide-react";
@@ -130,6 +131,16 @@ function Results() {
                 <SummaryLine label="Stack" value={estimate.stack || "-"} />
               </div>
             </div>
+          </div>
+
+          <div className="mt-8 flex justify-end border-t border-[#E5E5E5] pt-6">
+            <button
+              type="button"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#0A0A0A] px-6 text-sm font-bold text-white transition hover:bg-black/90"
+            >
+              <Download size={18} />
+              Download PDF
+            </button>
           </div>
         </section>
       </main>

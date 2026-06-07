@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { registerUser } from "../../services/authService";
+import { loginUser, registerUser } from "../../services/authService";
 
 function Signup() {
   const navigate = useNavigate();
@@ -42,7 +42,22 @@ function Signup() {
         form.role
       );
 
-      navigate("/admin/login");
+      const data = await loginUser(
+        form.email,
+        form.password
+      );
+
+      localStorage.setItem(
+        "token",
+        data.token
+      );
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(data.user)
+      );
+
+      navigate("/client/dashboard");
 
     } catch (error) {
 
@@ -101,20 +116,7 @@ function Signup() {
                 />
               </label>
 
-              <label className="block">
-                <span className="mb-2 block text-sm font-semibold text-black/70">
-                  Role
-                </span>
-
-                <select
-                  className="h-12 w-full rounded-xl border border-black/10 bg-white px-4 text-sm"
-                  name="role"
-                  value={form.role}
-                  onChange={updateField}
-                >
-                  <option value="client">Client</option>
-                </select>
-              </label>
+              
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <label className="block">
@@ -160,7 +162,7 @@ function Signup() {
 
             <p className="mt-8 text-center text-sm text-black/50">
               Already have an account?{" "}
-              <Link className="font-bold text-black hover:underline" to="/admin/login">
+              <Link className="font-bold text-black hover:underline" to="/login">
                 Sign in
               </Link>
             </p>

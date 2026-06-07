@@ -16,6 +16,8 @@ import ProtectedRoute from "./components/ProtectedRoutes.jsx";
 import AdminRoute from "./components/AdminRoute.jsx";
 import ClientRoute from "./components/ClientRoute.jsx";
 
+import ClientDashboard from "./pages/main/ClientDashboard.jsx";
+import ClientEstimations from "./pages/main/ClientEstimations.jsx";
 import ClientProfile from "./pages/main/ClientProfile.jsx";
 import EstimationPage from "./pages/main/Estimation";
 import ResultsPage from "./pages/main/Results.jsx";
@@ -25,7 +27,7 @@ function LandingWrapper() {
 
   return (
     <BeaconLanding
-      onEnterApp={() => navigate("/login")}
+      onEnterApp={(path = "/login") => navigate(path)}
     />
   );
 }
@@ -45,7 +47,31 @@ function App() {
       <Route path="/admin/settings" element={<Settings />} />
       <Route path="/admin/pricing" element={<Pricing />} />
 
-      <Route path="/clientProfile" element={<ClientProfile/>} />
+      <Route
+        path="/client/dashboard"
+        element={
+          <ClientRoute>
+            <ClientDashboard />
+          </ClientRoute>
+        }
+      />
+      <Route
+        path="/client/profile"
+        element={
+          <ClientRoute>
+            <ClientProfile />
+          </ClientRoute>
+        }
+      />
+      <Route
+        path="/client/estimations"
+        element={
+          <ClientRoute>
+            <ClientEstimations />
+          </ClientRoute>
+        }
+      />
+      <Route path="/clientProfile" element={<ClientProfile />} />
       <Route path="/estimations" element={<EstimationPage />} />
       <Route path="/results" element={<ResultsPage />} />
     </Routes>

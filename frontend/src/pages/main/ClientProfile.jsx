@@ -1,15 +1,14 @@
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const sidebarItems = [
-  "Dashboard",
-  "New Estimate",
-  "My Estimates",
-  "Quotations",
-  "Downloads",
-  "Messages",
-  "Profile",
-  "Settings",
-  "Logout",
+  { label: "Dashboard", path: "/client/dashboard" },
+  { label: "New Estimate", path: "/estimations" },
+  { label: "My Estimates", path: "/client/estimations" },
+  { label: "Downloads" },
+  { label: "Profile", path: "/client/profile" },
+  { label: "Settings" },
+  { label: "Logout", action: "logout" },
 ];
 
 const profile = {
@@ -99,6 +98,8 @@ const notifications = [
 ];
 
 export default function ClientProfile() {
+  const navigate = useNavigate();
+
   useEffect(() => {
     try {
       console.log(
@@ -113,6 +114,25 @@ export default function ClientProfile() {
     }
   }, []);
 
+  const handleSidebarClick = (item) => {
+    if (item.action === "logout") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      navigate("/login");
+      return;
+    }
+
+    if (!item.path) {
+      return;
+    }
+
+    navigate(item.path);
+  };
+
+  const goToEstimator = () => {
+    navigate("/estimations");
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8">
@@ -126,14 +146,15 @@ export default function ClientProfile() {
             <nav className="space-y-2">
               {sidebarItems.map((item) => (
                 <button
-                  key={item}
+                  key={item.label}
+                  onClick={() => handleSidebarClick(item)}
                   className={`w-full rounded-2xl px-4 py-3 text-left text-sm font-medium transition ${
-                    item === "Profile"
+                    item.label === "Profile"
                       ? "bg-slate-900 text-white shadow-md"
                       : "text-slate-700 hover:bg-slate-100"
                   }`}
                 >
-                  {item}
+                  {item.label}
                 </button>
               ))}
             </nav>
@@ -243,7 +264,10 @@ export default function ClientProfile() {
                     Track your most recent estimations and their current approval status.
                   </p>
                 </div>
-                <button className="h-11 w-full max-w-[180px] rounded-xl bg-slate-900 text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-auto">
+                <button
+                  onClick={goToEstimator}
+                  className="h-11 w-full max-w-[180px] rounded-xl bg-slate-900 text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-auto"
+                >
                   Create estimate
                 </button>
               </div>
@@ -293,7 +317,10 @@ export default function ClientProfile() {
                     <h2 className="text-xl font-black tracking-tight">Saved projects</h2>
                     <p className="mt-1 text-sm text-slate-500">Keep your best estimates ready for a fast relaunch.</p>
                   </div>
-                  <button className="h-11 rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white transition hover:bg-slate-800">
+                  <button
+                    onClick={goToEstimator}
+                    className="h-11 rounded-xl bg-slate-900 px-5 text-sm font-semibold text-white transition hover:bg-slate-800"
+                  >
                     New project
                   </button>
                 </div>
@@ -310,7 +337,10 @@ export default function ClientProfile() {
                       </div>
                       <div className="mt-5 flex items-center justify-between text-sm text-slate-500">
                         <span>{project.modified}</span>
-                        <button className="rounded-full bg-slate-900 px-4 py-2 text-white transition hover:bg-slate-800">
+                        <button
+                          onClick={goToEstimator}
+                          className="rounded-full bg-slate-900 px-4 py-2 text-white transition hover:bg-slate-800"
+                        >
                           Continue
                         </button>
                       </div>
