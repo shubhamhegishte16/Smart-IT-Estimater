@@ -16,7 +16,7 @@ import ProtectedRoute from "./components/ProtectedRoutes.jsx";
 import AdminRoute from "./components/AdminRoute.jsx";
 import ClientRoute from "./components/ClientRoute.jsx";
 
-/* ✅ ADD THESE TWO IMPORTS */
+import ClientProfile from "./pages/main/ClientProfile.jsx";
 import EstimationPage from "./pages/main/Estimation";
 import ResultsPage from "./pages/main/Results.jsx";
 
@@ -45,7 +45,7 @@ function App() {
       <Route path="/admin/settings" element={<Settings />} />
       <Route path="/admin/pricing" element={<Pricing />} />
 
-      {/* ✅ NEW ROUTES ADDED */}
+      <Route path="/clientProfile" element={<ClientProfile/>} />
       <Route path="/estimations" element={<EstimationPage />} />
       <Route path="/results" element={<ResultsPage />} />
     </Routes>
