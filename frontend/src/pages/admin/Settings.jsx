@@ -72,16 +72,25 @@ function Settings() {
     );
   }
 
-  return (
-    <AdminLayout>
-      <h1 className="text-2xl font-bold mb-6">
-        Settings
-      </h1>
+return (
+  <AdminLayout>
+    <div className="w-full">
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-slate-900">
+          Settings
+        </h1>
+
+        <p className="text-sm text-gray-500 mt-1">
+          Configure company information, estimation rules, and system preferences.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
         {/* Company Information */}
-        <div className="bg-white p-6 rounded-xl border shadow-sm">
+        <div className="bg-white p-6 rounded-2xl border border-gray-200">
           <h2 className="text-lg font-semibold mb-4">
             Company Information
           </h2>
@@ -94,7 +103,7 @@ function Settings() {
               value={settings.companyName}
               onChange={handleChange}
               placeholder="Company Name"
-              className="w-full border rounded-lg p-3"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black"
             />
 
             <input
@@ -103,7 +112,7 @@ function Settings() {
               value={settings.companyEmail}
               onChange={handleChange}
               placeholder="Company Email"
-              className="w-full border rounded-lg p-3"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black"
             />
 
             <input
@@ -112,30 +121,29 @@ function Settings() {
               value={settings.companyPhone}
               onChange={handleChange}
               placeholder="Phone Number"
-              className="w-full border rounded-lg p-3"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black"
             />
 
             <textarea
               name="companyAddress"
               value={settings.companyAddress}
               onChange={handleChange}
-              placeholder="Company Address"
               rows="3"
-              className="w-full border rounded-lg p-3"
+              placeholder="Company Address"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black"
             />
-
           </div>
 
           <button
             onClick={handleSave}
-            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+            className="mt-5 bg-black hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium"
           >
             Save Company Information
           </button>
         </div>
 
         {/* Estimation Settings */}
-        <div className="bg-white p-6 rounded-xl border shadow-sm">
+        <div className="bg-white p-6 rounded-2xl border border-gray-200">
           <h2 className="text-lg font-semibold mb-4">
             Estimation Settings
           </h2>
@@ -148,7 +156,7 @@ function Settings() {
               value={settings.lowComplexityLimit}
               onChange={handleChange}
               placeholder="Low Complexity Limit"
-              className="w-full border rounded-lg p-3"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black"
             />
 
             <input
@@ -157,21 +165,20 @@ function Settings() {
               value={settings.mediumComplexityLimit}
               onChange={handleChange}
               placeholder="Medium Complexity Limit"
-              className="w-full border rounded-lg p-3"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black"
             />
-
           </div>
 
           <button
             onClick={handleSave}
-            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+            className="mt-5 bg-black hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium"
           >
             Save Estimation Rules
           </button>
         </div>
 
         {/* Currency Settings */}
-        <div className="bg-white p-6 rounded-xl border shadow-sm">
+        <div className="bg-white p-6 rounded-2xl border border-gray-200">
           <h2 className="text-lg font-semibold mb-4">
             Currency Settings
           </h2>
@@ -182,7 +189,7 @@ function Settings() {
               name="currency"
               value={settings.currency}
               onChange={handleChange}
-              className="w-full border rounded-lg p-3"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black"
             >
               <option value="INR">INR (₹)</option>
               <option value="USD">USD ($)</option>
@@ -195,68 +202,68 @@ function Settings() {
               value={settings.quotationPrefix}
               onChange={handleChange}
               placeholder="Quotation Prefix"
-              className="w-full border rounded-lg p-3"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black"
             />
-
           </div>
 
           <button
             onClick={handleSave}
-            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+            className="mt-5 bg-black hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium"
           >
             Save Currency Settings
           </button>
         </div>
 
-        {/* Current Settings Preview */}
-        <div className="bg-white p-6 rounded-xl border shadow-sm">
+        {/* Current Configuration */}
+        <div className="bg-white p-6 rounded-2xl border border-gray-200">
           <h2 className="text-lg font-semibold mb-4">
             Current Configuration
           </h2>
 
-          <div className="space-y-2 text-sm">
+          <div className="space-y-3 text-sm text-gray-700">
 
-            <p>
-              <strong>Company:</strong>{" "}
-              {settings.companyName}
-            </p>
+            <div>
+              <span className="font-semibold">Company:</span>{" "}
+              {settings.companyName || "-"}
+            </div>
 
-            <p>
-              <strong>Email:</strong>{" "}
-              {settings.companyEmail}
-            </p>
+            <div>
+              <span className="font-semibold">Email:</span>{" "}
+              {settings.companyEmail || "-"}
+            </div>
 
-            <p>
-              <strong>Phone:</strong>{" "}
-              {settings.companyPhone}
-            </p>
+            <div>
+              <span className="font-semibold">Phone:</span>{" "}
+              {settings.companyPhone || "-"}
+            </div>
 
-            <p>
-              <strong>Currency:</strong>{" "}
+            <div>
+              <span className="font-semibold">Currency:</span>{" "}
               {settings.currency}
-            </p>
+            </div>
 
-            <p>
-              <strong>Quotation Prefix:</strong>{" "}
-              {settings.quotationPrefix}
-            </p>
+            <div>
+              <span className="font-semibold">Quotation Prefix:</span>{" "}
+              {settings.quotationPrefix || "-"}
+            </div>
 
-            <p>
-              <strong>Low Complexity:</strong>{" "}
-              {settings.lowComplexityLimit}
-            </p>
+            <div>
+              <span className="font-semibold">Low Complexity:</span>{" "}
+              ₹{settings.lowComplexityLimit?.toLocaleString()}
+            </div>
 
-            <p>
-              <strong>Medium Complexity:</strong>{" "}
-              {settings.mediumComplexityLimit}
-            </p>
+            <div>
+              <span className="font-semibold">Medium Complexity:</span>{" "}
+              ₹{settings.mediumComplexityLimit?.toLocaleString()}
+            </div>
 
           </div>
         </div>
 
       </div>
-    </AdminLayout>
-  );
+    </div>
+  </AdminLayout>
+);
 }
 
 export default Settings;

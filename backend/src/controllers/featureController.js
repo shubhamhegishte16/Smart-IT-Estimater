@@ -18,8 +18,6 @@ export const getFeatures = async (req, res) => {
 
         const features = await Feature.find();
 
-        console.log(features);
-
         res.json(features);
     } catch (error) {
         console.log(error);

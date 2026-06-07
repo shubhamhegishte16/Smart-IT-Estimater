@@ -3,20 +3,16 @@ import Header from "./Header";
 
 function AdminLayout({ children }) {
   return (
-    <div className="flex min-h-screen bg-gray-100">
-
+    <div className="flex h-screen bg-[#F7F6F1] overflow-hidden">
       <Sidebar />
 
-      <div className="flex-1">
-
+      <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
 
-        <main className="p-6">
+        <main className="flex-1 overflow-y-auto px-12 py-10 bg-[#F7F6F1]">
           {children}
         </main>
-
       </div>
-
     </div>
   );
 }

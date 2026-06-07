@@ -26,90 +26,102 @@ function Estimations() {
 
   return (
     <AdminLayout>
-      <h1 className="text-2xl font-bold mb-6">
-        Estimations
-      </h1>
+      <div className="w-full">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-slate-900">
+            Estimations
+          </h1>
 
-      <div className="bg-white rounded-xl border overflow-hidden">
-        {loading ? (
-          <div className="p-6">
-            Loading Estimations...
-          </div>
-        ) : (
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="text-left p-4">
-                  Client
-                </th>
+          <p className="text-sm text-gray-500 mt-1">
+            View and manage all generated project estimations.
+          </p>
+        </div>
 
-                <th className="text-left p-4">
-                  Email
-                </th>
-
-                <th className="text-left p-4">
-                  Project Type
-                </th>
-
-                <th className="text-left p-4">
-                  Cost
-                </th>
-
-                <th className="text-left p-4">
-                  Days
-                </th>
-
-                <th className="text-left p-4">
-                  Complexity
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {estimations.map((item) => (
-                <tr
-                  key={item._id}
-                  className="border-t"
-                >
-                  <td className="p-4">
-                    {item.clientName}
-                  </td>
-
-                  <td className="p-4">
-                    {item.clientEmail}
-                  </td>
-
-                  <td className="p-4">
-                    {item.projectType?.name}
-                  </td>
-
-                  <td className="p-4">
-                    ₹{item.totalCost?.toLocaleString()}
-                  </td>
-
-                  <td className="p-4">
-                    {item.totalDays} Days
-                  </td>
-
-                  <td className="p-4">
-                    {item.complexity}
-                  </td>
-                </tr>
-              ))}
-
-              {estimations.length === 0 && (
+        {/* Table Card */}
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+          {loading ? (
+            <div className="p-10 text-center text-gray-500">
+              Loading estimations...
+            </div>
+          ) : (
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <td
-                    colSpan="6"
-                    className="p-6 text-center text-gray-500"
-                  >
-                    No Estimations Found
-                  </td>
+                  <th className="text-left p-3 text-xs uppercase tracking-wider text-gray-500">
+                    Client
+                  </th>
+
+                  <th className="text-left p-3 text-xs uppercase tracking-wider text-gray-500">
+                    Email
+                  </th>
+
+                  <th className="text-left p-3 text-xs uppercase tracking-wider text-gray-500">
+                    Project Type
+                  </th>
+
+                  <th className="text-left p-3 text-xs uppercase tracking-wider text-gray-500">
+                    Cost
+                  </th>
+
+                  <th className="text-left p-3 text-xs uppercase tracking-wider text-gray-500">
+                    Days
+                  </th>
+
+                  <th className="text-left p-3 text-xs uppercase tracking-wider text-gray-500">
+                    Complexity
+                  </th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        )}
+              </thead>
+
+              <tbody>
+                {estimations.map((item) => (
+                  <tr
+                    key={item._id}
+                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="p-3 font-medium text-slate-900">
+                      {item.clientName}
+                    </td>
+
+                    <td className="p-3 text-slate-700">
+                      {item.clientEmail}
+                    </td>
+
+                    <td className="p-3 text-slate-700">
+                      {item.projectType?.name}
+                    </td>
+
+                    <td className="p-3 text-slate-700">
+                      ₹{item.totalCost?.toLocaleString()}
+                    </td>
+
+                    <td className="p-3 text-slate-700">
+                      {item.totalDays} Days
+                    </td>
+
+                    <td className="p-3">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                        {item.complexity}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+
+                {estimations.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan="6"
+                      className="p-10 text-center text-gray-500"
+                    >
+                      No Estimations Found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          )}
+        </div>
       </div>
     </AdminLayout>
   );

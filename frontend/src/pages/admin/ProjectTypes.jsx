@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { getProjectTypes } from "../../services/projectTypeService";
+import { Pencil, Trash2, Plus } from "lucide-react";
 
 function ProjectTypes() {
   const [projectTypes, setProjectTypes] = useState([]);
@@ -23,86 +24,105 @@ function ProjectTypes() {
 
   return (
     <AdminLayout>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">
-          Project Types
-        </h1>
+      <div className="w-full">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">
+              Project Types
+            </h1>
 
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-          Add Type
-        </button>
-      </div>
-
-      <div className="bg-white rounded-xl border overflow-hidden shadow-sm">
-        {loading ? (
-          <div className="p-6">
-            Loading Project Types...
+            <p className="text-sm text-gray-500 mt-1">
+              Manage project categories, base costs, and delivery timelines.
+            </p>
           </div>
-        ) : (
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="text-left p-4 font-semibold">
-                  Name
-                </th>
 
-                <th className="text-left p-4 font-semibold">
-                  Base Cost
-                </th>
+          <button className="bg-black hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
+            <Plus size={16} />
+            Add Type
+          </button>
+        </div>
 
-                <th className="text-left p-4 font-semibold">
-                  Base Days
-                </th>
-
-                <th className="text-left p-4 font-semibold">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {projectTypes.map((type) => (
-                <tr
-                  key={type._id}
-                  className="border-t hover:bg-gray-50"
-                >
-                  <td className="p-4">
-                    {type.name}
-                  </td>
-
-                  <td className="p-4">
-                    ₹{type.baseCost.toLocaleString()}
-                  </td>
-
-                  <td className="p-4">
-                    {type.baseDays} Days
-                  </td>
-
-                  <td className="p-4">
-                    <button className="text-blue-600 mr-4 hover:underline">
-                      Edit
-                    </button>
-
-                    <button className="text-red-500 hover:underline">
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-
-              {projectTypes.length === 0 && (
+        {/* Table Card */}
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+          {loading ? (
+            <div className="p-10 text-center text-gray-500">
+              Loading project types...
+            </div>
+          ) : (
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <td
-                    colSpan="4"
-                    className="text-center p-6 text-gray-500"
-                  >
-                    No Project Types Found
-                  </td>
+                  <th className="text-left p-3 text-xs uppercase tracking-wider text-gray-500">
+                    Name
+                  </th>
+
+                  <th className="text-left p-3 text-xs uppercase tracking-wider text-gray-500">
+                    Base Cost
+                  </th>
+
+                  <th className="text-left p-3 text-xs uppercase tracking-wider text-gray-500">
+                    Base Days
+                  </th>
+
+                  <th className="text-right p-3 text-xs uppercase tracking-wider text-gray-500">
+                    Actions
+                  </th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        )}
+              </thead>
+
+              <tbody>
+                {projectTypes.map((type) => (
+                  <tr
+                    key={type._id}
+                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="p-3 font-medium text-slate-900">
+                      {type.name}
+                    </td>
+
+                    <td className="p-3 text-slate-700">
+                      ₹{type.baseCost.toLocaleString()}
+                    </td>
+
+                    <td className="p-3 text-slate-700">
+                      {type.baseDays} Days
+                    </td>
+
+                    <td className="p-3">
+                      <div className="flex justify-end gap-4">
+                        <button className="flex items-center gap-1 text-gray-600 hover:text-black transition-colors">
+                          <Pencil size={16} />
+                          <span className="text-sm">
+                            Edit
+                          </span>
+                        </button>
+
+                        <button className="flex items-center gap-1 text-red-500 hover:text-red-700 transition-colors">
+                          <Trash2 size={16} />
+                          <span className="text-sm">
+                            Delete
+                          </span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+
+                {projectTypes.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan="4"
+                      className="p-10 text-center text-gray-500"
+                    >
+                      No Project Types Found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          )}
+        </div>
       </div>
     </AdminLayout>
   );

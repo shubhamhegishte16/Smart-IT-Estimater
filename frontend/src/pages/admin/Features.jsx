@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import AdminLayout from "../../components/admin/AdminLayout";
+import StatCard from "../../components/admin/StatCard";
 import * as FeatureService from "../../services/featureService.js";
 
 console.log("FeatureService:", FeatureService);
@@ -20,7 +22,7 @@ import {
 function Features() {
   const [features, setFeatures] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Modal Control States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingFeature, setEditingFeature] = useState(null);
@@ -134,170 +136,116 @@ function Features() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F4F3EB] text-[#0D1B15] font-sans antialiased relative">
-
-      {/* ================= SIDEBAR NAVIGATION ================= */}
-      <aside className="w-[260px] bg-[#F9F8F3] border-r border-[#E5E3D8] flex flex-col justify-between p-6 shrink-0">
-        <div>
-          <div className="flex items-center gap-3 mb-10 pl-2">
-            <Link to="/" className="mb-10 inline-flex items-center gap-3 text-lg font-black tracking-tight">
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-[#0A0A0A] text-white">B</span>
-              Beacon
-            </Link>
-          </div>
-
-          <div className="space-y-6">
-            <div>
-              <div className="text-[11px] font-bold tracking-widest text-[#8A8F8A] uppercase mb-3 pl-3">
-                Admin
-              </div>
-              <nav className="space-y-1.5">
-                <a href="#overview" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#55635C] hover:bg-[#EAE8DD] hover:text-[#0D1B15] transition-colors">
-                  <LayoutDashboard size={18} className="text-[#8A8F8A]" />
-                  Overview
-                </a>
-                <a href="#features" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-[#0A0A0A] text-white transition-colors shadow-sm">
-                  <Layers size={18} />
-                  Features
-                </a>
-                <a href="#pricing" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#55635C] hover:bg-[#EAE8DD] hover:text-[#0D1B15] transition-colors">
-                  <DollarSign size={18} className="text-[#8A8F8A]" />
-                  Pricing
-                </a>
-                <a href="#project-types" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#55635C] hover:bg-[#EAE8DD] hover:text-[#0D1B15] transition-colors">
-                  <FolderKanban size={18} className="text-[#8A8F8A]" />
-                  Project Types
-                </a>
-                <a href="#estimations" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#55635C] hover:bg-[#EAE8DD] hover:text-[#0D1B15] transition-colors">
-                  <FileSpreadsheet size={18} className="text-[#8A8F8A]" />
-                  Estimations
-                </a>
-                <a href="#settings" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#55635C] hover:bg-[#EAE8DD] hover:text-[#0D1B15] transition-colors">
-                  <Settings size={18} className="text-[#8A8F8A]" />
-                  Settings
-                </a>
-              </nav>
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t border-[#E5E3D8] pt-4">
-          <button className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm font-medium text-[#55635C] hover:bg-red-50 hover:text-red-600 transition-colors">
-            <LogOut size={18} className="text-[#8A8F8A] group-hover:text-red-600" />
-            Sign out
-          </button>
-        </div>
-      </aside>
+    <AdminLayout>
 
       {/* ================= MAIN DASHBOARD CONTENT ================= */}
-      <main className="flex-1 p-12 max-w-7xl mx-auto w-full">
+      <div className="w-full">
 
-        <div className="flex justify-between items-start mb-10">
+        <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-[34px] font-bold text-[#0D1B15] tracking-tight mb-2">
+            <h1 className="text-3xl font-bold text-slate-900">
               Manage Features
             </h1>
-            <p className="text-[#55635C] text-base font-normal">
+            <p className="text-sm text-gray-500 mt-1">
               Add, edit, or disable features clients can select.
             </p>
           </div>
 
-          <button onClick={openAddModal} className="bg-[#0A0A0A] hover:bg-[#1A1A1A] text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 shadow-sm transition-colors">
+          <button onClick={openAddModal} className="bg-black hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors">
             <Plus size={18} />
             Add feature
           </button>
         </div>
 
-        <div className="bg-[#FBFBFA] rounded-2xl border border-[#E5E3D8] overflow-hidden shadow-sm">
-          {loading ? (
-            <div className="p-12 text-[#55635C] text-center font-medium">
-              Loading features from server...
-            </div>
-          ) : (
-            <table className="w-full border-collapse text-left">
-              <thead>
-                <tr className="border-b border-[#E5E3D8]">
-                  <th className="p-4 pl-6 text-[11px] font-bold uppercase tracking-widest text-[#737E78] w-[35%]">Name</th>
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-[#737E78]">Category</th>
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-[#737E78]">Cost</th>
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-[#737E78]">Weeks</th>
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-[#737E78]">Complexity</th>
-                  <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-[#737E78]">Active</th>
-                  <th className="p-4 pr-6 w-24"></th>
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">          {loading ? (
+          <div className="p-12 text-[#55635C] text-center font-medium">
+            Loading features from server...
+          </div>
+        ) : (
+          <table className="w-full border-collapse text-left">
+            <thead>
+              <tr className="border-b border-[#E5E3D8]">
+                <th className="p-3 pl-6 text-[11px] font-bold uppercase tracking-widest text-[#737E78] w-[35%]">Name</th>
+                <th className="p-3 text-[11px] font-bold uppercase tracking-widest text-[#737E78]">Category</th>
+                <th className="p-3 text-[11px] font-bold uppercase tracking-widest text-[#737E78]">Cost</th>
+                <th className="p-3 text-[11px] font-bold uppercase tracking-widest text-[#737E78]">Weeks</th>
+                <th className="p-3 text-[11px] font-bold uppercase tracking-widest text-[#737E78]">Complexity</th>
+                <th className="p-3 text-[11px] font-bold uppercase tracking-widest text-[#737E78]">Active</th>
+                <th className="p-3 pr-6 w-24"></th>
+              </tr>
+            </thead>
+
+            <tbody className="divide-y divide-[#E5E3D8]/60">
+              {features.map((feature) => (
+                <tr key={feature._id} className="hover:bg-[#F6F5EE] transition-colors">
+                  <td className="p-3 pl-6 align-middle">
+                    <div className="font-semibold text-[#0D1B15] text-[15px]">{feature.name}</div>
+                    {feature.description && (
+                      <div className="text-[13px] text-[#737E78] mt-0.5 font-normal">{feature.description}</div>
+                    )}
+                  </td>
+                  <td className="p-4 align-middle">
+                    <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide ${getCategoryStyles(feature.category)}`}>
+                      {feature.category || "core"}
+                    </span>
+                  </td>
+                  <td className="p-4 align-middle font-medium text-[#0D1B15]">
+                    ${feature.cost?.toLocaleString() || "0"}
+                  </td>
+                  <td className="p-4 align-middle text-[#0D1B15]">{feature.weeks || 1}</td>
+                  <td className="p-4 align-middle text-[#0D1B15]">{feature.complexity || 1}</td>
+                  <td className="p-4 align-middle">
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={feature.isActive ?? true}
+                        onChange={() => handleToggleActive(feature)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-[#E5E3D8] rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0A0A0A]"></div>
+                    </label>
+                  </td>
+                  <td className="p-4 pr-6 align-middle text-right">
+                    <div className="flex items-center justify-end gap-4">
+                      <button onClick={() => openEditModal(feature)} className="text-[#737E78] hover:text-[#0D1B15] transition-colors">
+                        <Pencil size={17} />
+                      </button>
+                      <button onClick={() => handleDelete(feature._id)} className="text-[#E05353] hover:text-[#C03939] transition-colors">
+                        <Trash2 size={17} />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
+              ))}
 
-              <tbody className="divide-y divide-[#E5E3D8]/60">
-                {features.map((feature) => (
-                  <tr key={feature._id} className="hover:bg-[#F6F5EE] transition-colors">
-                    <td className="p-4 pl-6 align-middle">
-                      <div className="font-semibold text-[#0D1B15] text-[15px]">{feature.name}</div>
-                      {feature.description && (
-                        <div className="text-[13px] text-[#737E78] mt-0.5 font-normal">{feature.description}</div>
-                      )}
-                    </td>
-                    <td className="p-4 align-middle">
-                      <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide ${getCategoryStyles(feature.category)}`}>
-                        {feature.category || "core"}
-                      </span>
-                    </td>
-                    <td className="p-4 align-middle font-medium text-[#0D1B15]">
-                      ${feature.cost?.toLocaleString() || "0"}
-                    </td>
-                    <td className="p-4 align-middle text-[#0D1B15]">{feature.weeks || 1}</td>
-                    <td className="p-4 align-middle text-[#0D1B15]">{feature.complexity || 1}</td>
-                    <td className="p-4 align-middle">
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input 
-                          type="checkbox" 
-                          checked={feature.isActive ?? true} 
-                          onChange={() => handleToggleActive(feature)}
-                          className="sr-only peer" 
-                        />
-                        <div className="w-11 h-6 bg-[#E5E3D8] rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0A0A0A]"></div>
-                      </label>
-                    </td>
-                    <td className="p-4 pr-6 align-middle text-right">
-                      <div className="flex items-center justify-end gap-4">
-                        <button onClick={() => openEditModal(feature)} className="text-[#737E78] hover:text-[#0D1B15] transition-colors">
-                          <Pencil size={17} />
-                        </button>
-                        <button onClick={() => handleDelete(feature._id)} className="text-[#E05353] hover:text-[#C03939] transition-colors">
-                          <Trash2 size={17} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-
-                {/* Missing Data Fallback State */}
-                {features.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan="7"
-                      className="p-16 text-center text-[#737E78] font-medium text-sm"
-                    >
-                      No Features Found. Click "Add feature" to get started.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          )}
+              {/* Missing Data Fallback State */}
+              {features.length === 0 && (
+                <tr>
+                  <td
+                    colSpan="7"
+                    className="p-10 text-center text-[#737E78] font-medium text-sm"
+                  >
+                    No Features Found. Click "Add feature" to get started.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
         </div>
-      </main>
+      </div>
 
       {/* ================= MODAL INTERFACE (image_0fc2fe.png) ================= */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs">
           <div className="bg-white rounded-2xl w-full max-w-[540px] p-6 shadow-xl relative font-sans text-[#0D1B15]">
-            
+
             {/* Header Area */}
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-xl font-bold tracking-tight">
                 {editingFeature ? "Edit feature" : "New feature"}
               </h2>
-              <button 
+              <button
                 onClick={() => setIsModalOpen(false)}
                 className="text-[#737E78] hover:text-[#0D1B15] p-1 rounded-lg transition-colors"
               >
@@ -307,7 +255,7 @@ function Features() {
 
             {/* Modal Interactive Input Fields Form */}
             <form onSubmit={handleFormSubmit} className="space-y-4">
-              
+
               {/* Feature Title Name input row */}
               <div>
                 <label className="block text-[13px] font-medium text-[#0D1B15] mb-1.5">Name</label>
@@ -419,7 +367,7 @@ function Features() {
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 }
 
