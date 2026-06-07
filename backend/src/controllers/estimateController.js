@@ -27,8 +27,8 @@ export const createEstimation = async (req, res) => {
         let totalDays = projectType.baseDays;
 
         features.forEach(feature => {
-            totalCost += feature.cost;
-            totalDays += feature.days;
+            totalCost += feature.cost || 0;
+            totalDays += Math.round((feature.weeks || 0) * 7);
         });
 
         let complexity = "Low";

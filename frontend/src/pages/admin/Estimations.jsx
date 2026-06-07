@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
-import { getEstimations } from "../../services/estimationService";
+import {
+  deleteEstimation,
+  getEstimations,
+} from "../../services/estimationService";
+import { Trash2 } from "lucide-react";
 
 function Estimations() {
   const [estimations, setEstimations] = useState([]);
@@ -23,6 +27,20 @@ function Estimations() {
 
     fetchEstimations();
   }, []);
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this estimation?")) return;
+
+    try {
+      await deleteEstimation(id);
+      setEstimations((current) =>
+        current.filter((item) => item._id !== id)
+      );
+    } catch (error) {
+      console.error("Error deleting estimation:", error);
+      alert("Failed to delete estimation");
+    }
+  };
 
   return (
     <AdminLayout>
@@ -71,6 +89,10 @@ function Estimations() {
                   <th className="text-left p-3 text-xs uppercase tracking-wider text-gray-500">
                     Complexity
                   </th>
+
+                  <th className="text-right p-3 text-xs uppercase tracking-wider text-gray-500">
+                    Actions
+                  </th>
                 </tr>
               </thead>
 
@@ -105,13 +127,25 @@ function Estimations() {
                         {item.complexity}
                       </span>
                     </td>
+
+                    <td className="p-3 text-right">
+                      <button
+                        onClick={() => handleDelete(item._id)}
+                        className="inline-flex items-center gap-1 text-red-500 hover:text-red-700 transition-colors"
+                      >
+                        <Trash2 size={16} />
+                        <span className="text-sm">
+                          Delete
+                        </span>
+                      </button>
+                    </td>
                   </tr>
                 ))}
 
                 {estimations.length === 0 && (
                   <tr>
                     <td
-                      colSpan="6"
+                      colSpan="7"
                       className="p-10 text-center text-gray-500"
                     >
                       No Estimations Found

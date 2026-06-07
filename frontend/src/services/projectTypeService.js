@@ -1,11 +1,27 @@
-const API_URL = "http://localhost:5000/api/project-types";
+import { API_BASE_URL, requestJson } from "./api";
+
+const API_URL = `${API_BASE_URL}/project-types`;
 
 export const getProjectTypes = async () => {
-  const response = await fetch(API_URL);
+  return requestJson(API_URL);
+};
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch project types");
-  }
+export const createProjectType = async (projectTypeData) => {
+  return requestJson(API_URL, {
+    method: "POST",
+    body: JSON.stringify(projectTypeData),
+  });
+};
 
-  return response.json();
+export const updateProjectType = async (id, projectTypeData) => {
+  return requestJson(`${API_URL}/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(projectTypeData),
+  });
+};
+
+export const deleteProjectType = async (id) => {
+  return requestJson(`${API_URL}/${id}`, {
+    method: "DELETE",
+  });
 };

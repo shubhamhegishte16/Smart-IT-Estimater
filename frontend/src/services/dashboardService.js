@@ -1,11 +1,7 @@
-const API_URL = "http://localhost:5000/api/dashboard/overview";
+import { API_BASE_URL, requestJson } from "./api";
+
+const API_URL = `${API_BASE_URL}/dashboard/overview`;
 
 export const getDashboardOverview = async () => {
-  const response = await fetch(API_URL);
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch dashboard data");
-  }
-
-  return response.json();
+  return requestJson(API_URL);
 };

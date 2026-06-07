@@ -27,7 +27,9 @@ const estimationSchema = new mongoose.Schema({
 
     totalDays: Number,
 
-    complexity: String
+    complexity: String,
+
+    recommendedStack: [String]
 
 }, {
     timestamps: true

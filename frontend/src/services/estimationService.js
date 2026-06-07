@@ -1,11 +1,20 @@
-const API_URL = "http://localhost:5000/api/estimations";
+import { API_BASE_URL, requestJson } from "./api";
+
+const API_URL = `${API_BASE_URL}/estimations`;
 
 export const getEstimations = async () => {
-  const response = await fetch(API_URL);
+  return requestJson(API_URL);
+};
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch estimations");
-  }
+export const createEstimation = async (estimationData) => {
+  return requestJson(API_URL, {
+    method: "POST",
+    body: JSON.stringify(estimationData),
+  });
+};
 
-  return response.json();
+export const deleteEstimation = async (id) => {
+  return requestJson(`${API_URL}/${id}`, {
+    method: "DELETE",
+  });
 };

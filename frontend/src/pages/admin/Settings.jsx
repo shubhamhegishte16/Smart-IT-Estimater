@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import AdminLayout from "../../components/admin/AdminLayout";
+import {
+  getSettings,
+  updateSettings,
+} from "../../services/settingsService";
 
 function Settings() {
   const [loading, setLoading] = useState(true);
@@ -22,11 +25,8 @@ function Settings() {
 
   const fetchSettings = async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:5000/api/settings"
-      );
-
-      setSettings(res.data);
+      const data = await getSettings();
+      setSettings(data);
     } catch (error) {
       console.error("Error fetching settings:", error);
     } finally {
@@ -36,12 +36,8 @@ function Settings() {
 
   const handleSave = async () => {
     try {
-      const res = await axios.put(
-        "http://localhost:5000/api/settings",
-        settings
-      );
-
-      setSettings(res.data);
+      const data = await updateSettings(settings);
+      setSettings(data);
 
       alert("Settings updated successfully");
     } catch (error) {
@@ -191,9 +187,9 @@ return (
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-black"
             >
-              <option value="INR">INR (₹)</option>
+              <option value="INR">INR (Rs)</option>
               <option value="USD">USD ($)</option>
-              <option value="EUR">EUR (€)</option>
+              <option value="EUR">EUR</option>
             </select>
 
             <input
@@ -249,12 +245,12 @@ return (
 
             <div>
               <span className="font-semibold">Low Complexity:</span>{" "}
-              ₹{settings.lowComplexityLimit?.toLocaleString()}
+              {settings.currency} {settings.lowComplexityLimit?.toLocaleString()}
             </div>
 
             <div>
               <span className="font-semibold">Medium Complexity:</span>{" "}
-              ₹{settings.mediumComplexityLimit?.toLocaleString()}
+              {settings.currency} {settings.mediumComplexityLimit?.toLocaleString()}
             </div>
 
           </div>

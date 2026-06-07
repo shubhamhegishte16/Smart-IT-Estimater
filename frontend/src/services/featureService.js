@@ -1,64 +1,27 @@
-const API_URL = "http://localhost:5000/api/features";
+import { API_BASE_URL, requestJson } from "./api";
+
+const API_URL = `${API_BASE_URL}/features`;
 
 export const getFeatures = async () => {
-  const response = await fetch(API_URL);
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch features");
-  }
-
-  return response.json();
+  return requestJson(API_URL);
 };
 
 export const createFeature = async (featureData) => {
-  const response = await fetch(
-    API_URL,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(featureData),
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error("Failed to create feature");
-  }
-
-  return response.json();
+  return requestJson(API_URL, {
+    method: "POST",
+    body: JSON.stringify(featureData),
+  });
 };
 
 export const updateFeature = async (id, featureData) => {
-  const response = await fetch(
-    `${API_URL}/${id}`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(featureData),
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error("Failed to update feature");
-  }
-
-  return response.json();
+  return requestJson(`${API_URL}/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(featureData),
+  });
 };
 
 export const deleteFeature = async (id) => {
-  const response = await fetch(
-    `${API_URL}/${id}`,
-    {
-      method: "DELETE",
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error("Failed to delete feature");
-  }
-
-  return response.json();
+  return requestJson(`${API_URL}/${id}`, {
+    method: "DELETE",
+  });
 };

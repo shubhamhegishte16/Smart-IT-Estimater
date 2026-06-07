@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { registerUser } from "../../../../backend/src/services/authService.js";
+import { registerUser } from "../../services/authService";
 
 function Signup() {
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ function Signup() {
         form.role
       );
 
-      navigate("/login");
+      navigate("/admin/login");
 
     } catch (error) {
 
@@ -160,7 +160,7 @@ function Signup() {
 
             <p className="mt-8 text-center text-sm text-black/50">
               Already have an account?{" "}
-              <Link className="font-bold text-black hover:underline" to="/login">
+              <Link className="font-bold text-black hover:underline" to="/admin/login">
                 Sign in
               </Link>
             </p>
