@@ -954,14 +954,14 @@ export default function BeaconLanding({ onEnterApp }) {
       <style>{STYLES}</style>
       <div style={{ background: "#fff", fontFamily: "'DM Sans', sans-serif" }}>
         <Navbar onLogin={login} onSignup={signup} />
-        <Hero onNavigate={navigate} />
+        <Hero onNavigate={login} />
         <About />
         <Features />
-        <HowItWorks onNavigate={navigate} />
+        <HowItWorks onNavigate={login} />
         <ProjectTypes />
         <WhyBeacon />
         <Statistics />
-        <CTASection onNavigate={navigate} />
+        <CTASection onNavigate={login} />
         <Footer onNavigate={navigate} />
       </div>
     </>
