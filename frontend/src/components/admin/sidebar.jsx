@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-
+import beaconLogo from "../../assets/beacon-logo.png";
 function Sidebar() {
   const location = useLocation();
 
@@ -23,7 +23,7 @@ function Sidebar() {
           B
         </div>
         <span className="text-lg font-bold text-gray-900 tracking-tight">
-          Beacon
+          Test
         </span>
       </div>
 

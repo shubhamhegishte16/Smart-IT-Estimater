@@ -5,9 +5,9 @@ const sidebarItems = [
   { label: "Dashboard", path: "/client/dashboard" },
   { label: "New Estimate", path: "/estimations" },
   { label: "My Estimates", path: "/client/estimations" },
-  { label: "Downloads" },
+  { label: "Downloads", path: "/client/downloads" },
   { label: "Profile", path: "/client/profile" },
-  { label: "Settings" },
+  { label: "Settings", path: "/client/settings" },
   { label: "Logout", action: "logout" },
 ];
 
@@ -118,7 +118,7 @@ export default function ClientProfile() {
     if (item.action === "logout") {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      navigate("/login");
+      navigate("/");
       return;
     }
 

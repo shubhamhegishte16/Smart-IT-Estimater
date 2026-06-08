@@ -18,7 +18,9 @@ import ClientRoute from "./components/ClientRoute.jsx";
 
 import ClientDashboard from "./pages/main/ClientDashboard.jsx";
 import ClientEstimations from "./pages/main/ClientEstimations.jsx";
+import ClientDownload from "./pages/main/ClientDownload.jsx";
 import ClientProfile from "./pages/main/ClientProfile.jsx";
+import ClientSetting from "./pages/main/ClientSetting.jsx";
 import EstimationPage from "./pages/main/Estimation";
 import ResultsPage from "./pages/main/Results.jsx";
 
@@ -68,6 +70,22 @@ function App() {
         element={
           <ClientRoute>
             <ClientEstimations />
+          </ClientRoute>
+        }
+      />
+      <Route
+        path="/client/downloads"
+        element={
+          <ClientRoute>
+            <ClientDownload />
+          </ClientRoute>
+        }
+      />
+      <Route
+        path="/client/settings"
+        element={
+          <ClientRoute>
+            <ClientSetting />
           </ClientRoute>
         }
       />
