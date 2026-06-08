@@ -874,7 +874,6 @@ function CTASection({ onNavigate }) {
 
 // ─── FOOTER ───────────────────────────────────────────────────────────────────
 function Footer({ onNavigate }) {
-  const links = ["Home", "About", "Features", "Contact"];
 
   return (
     <footer style={{
@@ -890,23 +889,6 @@ function Footer({ onNavigate }) {
           <p style={{ fontSize: 13, color: "#555", fontFamily: "'DM Sans', sans-serif", maxWidth: 260, lineHeight: 1.6 }}>
             Smart Software Project Estimation Platform
           </p>
-        </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {links.map(l => (
-            <button
-              key={l}
-              onClick={l === "Home" || l === "Features" ? onNavigate : undefined}
-              style={{
-                padding: "8px 18px", borderRadius: 8,
-                border: "none", background: "transparent",
-                color: "#666", fontSize: 13, fontWeight: 500,
-                fontFamily: "'DM Sans', sans-serif",
-                cursor: "pointer", transition: "color 0.2s",
-              }}
-              onMouseEnter={e => e.currentTarget.style.color = "#fff"}
-              onMouseLeave={e => e.currentTarget.style.color = "#666"}
-            >{l}</button>
-          ))}
         </div>
         <p style={{ fontSize: 12, color: "#333", fontFamily: "'DM Sans', sans-serif" }}>
           © 2025 Beacon · All rights reserved

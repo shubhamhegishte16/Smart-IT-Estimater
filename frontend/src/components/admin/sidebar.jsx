@@ -23,7 +23,7 @@ function Sidebar() {
           B
         </div>
         <span className="text-lg font-bold text-gray-900 tracking-tight">
-          Test
+          Beacon
         </span>
       </div>
 

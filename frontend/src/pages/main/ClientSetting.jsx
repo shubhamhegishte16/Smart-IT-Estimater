@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Bell,
   Building2,
@@ -11,8 +11,8 @@ import {
   ShieldCheck,
   Sparkles,
   User,
+  Loader,
 } from "lucide-react";
-
 import ClientHubLayout from "../../components/main/ClientHubLayout";
 
 const currencyOptions = ["INR", "USD", "EUR", "GBP"];
@@ -20,82 +20,312 @@ const timezoneOptions = ["UTC -5:00", "UTC +0:00", "UTC +5:30", "UTC +1:00"];
 const languageOptions = ["English", "Spanish", "French", "German"];
 const dateFormats = ["DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD"];
 
-const initialPersonal = {
-  fullName: "Maya Patel",
-  company: "Lumenix Technologies",
-  email: "maya.patel@lumenix.io",
-  phone: "+1 (415) 555-0198",
-  website: "https://lumenix.io",
-  industry: "Fintech",
-  address: "295 Mission Street, San Francisco, CA 94105",
-};
-
-const initialNotifications = {
-  email: true,
-  sms: false,
-  approvals: true,
-  messages: true,
-  productUpdates: true,
-  marketing: false,
-};
-
 export default function ClientSetting() {
-  const [personal, setPersonal] = useState(initialPersonal);
-  const [security, setSecurity] = useState({
-    password: "",
-    confirmPassword: "",
-    twoFactor: true,
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState(null);
+  
+  const [personal, setPersonal] = useState({
+    fullName: "",
+    company: "",
+    email: "",
+    phone: "",
+    website: "",
+    industry: "",
+    address: "",
   });
-  const [notifications, setNotifications] = useState(initialNotifications);
+  
+  const [security, setSecurity] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+    twoFactor: false,
+  });
+  
+  const [notifications, setNotifications] = useState({
+    email: true,
+    sms: false,
+    approvals: true,
+    messages: true,
+    productUpdates: true,
+    marketing: false,
+  });
+  
   const [regional, setRegional] = useState({
     currency: "USD",
-    timezone: "UTC -5:00",
+    timezone: "UTC +5:30",
     language: "English",
     dateFormat: "DD/MM/YYYY",
   });
+  
   const [preferences, setPreferences] = useState({
-    defaultProjectType: "SaaS Platform",
-    defaultTechStack: "React + Node.js",
+    defaultProjectType: "",
+    defaultTechStack: "",
     autoSave: true,
     autoGeneratePDF: false,
   });
 
-  const handleReset = () => {
-    setPersonal(initialPersonal);
-    setSecurity({ password: "", confirmPassword: "", twoFactor: true });
-    setNotifications(initialNotifications);
-    setRegional({
-      currency: "USD",
-      timezone: "UTC -5:00",
-      language: "English",
-      dateFormat: "DD/MM/YYYY",
-    });
-    setPreferences({
-      defaultProjectType: "SaaS Platform",
-      defaultTechStack: "React + Node.js",
-      autoSave: true,
-      autoGeneratePDF: false,
-    });
+  // Fetch user settings on load
+  useEffect(() => {
+    fetchUserSettings();
+  }, []);
+
+  const fetchUserSettings = async () => {
+    try {
+      // Get logged-in user email
+      const userStr = localStorage.getItem("user");
+      let userEmail = null;
+      
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          userEmail = user.email;
+        } catch (e) {}
+      }
+      
+      if (!userEmail) {
+        userEmail = localStorage.getItem("userEmail") || "shubham@example.com";
+      }
+      
+      const response = await fetch(`http://localhost:5000/api/users/settings/${encodeURIComponent(userEmail)}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const settings = data.settings || data;
+        
+        // Update personal info
+        if (settings.personal) {
+          setPersonal({
+            fullName: settings.personal.fullName || "",
+            company: settings.personal.company || "",
+            email: settings.personal.email || userEmail,
+            phone: settings.personal.phone || "",
+            website: settings.personal.website || "",
+            industry: settings.personal.industry || "",
+            address: settings.personal.address || "",
+          });
+        } else {
+          // Fallback to user data
+          const user = JSON.parse(userStr);
+          setPersonal({
+            fullName: user?.name || "",
+            company: user?.company || "",
+            email: user?.email || userEmail,
+            phone: user?.phone || "",
+            website: "",
+            industry: "",
+            address: "",
+          });
+        }
+        
+        // Update notifications
+        if (settings.notifications) {
+          setNotifications(settings.notifications);
+        }
+        
+        // Update regional
+        if (settings.regional) {
+          setRegional(settings.regional);
+        }
+        
+        // Update preferences
+        if (settings.preferences) {
+          setPreferences(settings.preferences);
+        }
+        
+        // Update two-factor
+        if (settings.twoFactor !== undefined) {
+          setSecurity(prev => ({ ...prev, twoFactor: settings.twoFactor }));
+        }
+      }
+      
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+      setLoading(false);
+    }
   };
+
+  const saveAllSettings = async () => {
+    setSaving(true);
+    setMessage(null);
+    
+    try {
+      const userStr = localStorage.getItem("user");
+      let userEmail = null;
+      
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          userEmail = user.email;
+        } catch (e) {}
+      }
+      
+      if (!userEmail) {
+        userEmail = localStorage.getItem("userEmail") || "shubham@example.com";
+      }
+      
+      const settingsData = {
+        personal,
+        notifications,
+        regional,
+        preferences,
+        twoFactor: security.twoFactor
+      };
+      
+      const response = await fetch(`http://localhost:5000/api/users/settings/${encodeURIComponent(userEmail)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settingsData)
+      });
+      
+      if (response.ok) {
+        setMessage({ type: "success", text: "All settings saved successfully!" });
+        
+        // Update localStorage user data
+        if (personal.fullName || personal.company || personal.phone) {
+          const userStr = localStorage.getItem("user");
+          if (userStr) {
+            const user = JSON.parse(userStr);
+            user.name = personal.fullName || user.name;
+            user.company = personal.company || user.company;
+            user.phone = personal.phone || user.phone;
+            localStorage.setItem("user", JSON.stringify(user));
+          }
+        }
+        
+        setTimeout(() => setMessage(null), 3000);
+      } else {
+        throw new Error("Failed to save settings");
+      }
+    } catch (error) {
+      console.error("Error saving settings:", error);
+      setMessage({ type: "error", text: "Failed to save settings. Please try again." });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleReset = () => {
+    if (confirm("Reset all settings to default? This cannot be undone.")) {
+      setPersonal({
+        fullName: "",
+        company: "",
+        email: personal.email,
+        phone: "",
+        website: "",
+        industry: "",
+        address: "",
+      });
+      setSecurity(prev => ({ ...prev, newPassword: "", confirmPassword: "", twoFactor: false }));
+      setNotifications({
+        email: true,
+        sms: false,
+        approvals: true,
+        messages: true,
+        productUpdates: true,
+        marketing: false,
+      });
+      setRegional({
+        currency: "USD",
+        timezone: "UTC +5:30",
+        language: "English",
+        dateFormat: "DD/MM/YYYY",
+      });
+      setPreferences({
+        defaultProjectType: "",
+        defaultTechStack: "",
+        autoSave: true,
+        autoGeneratePDF: false,
+      });
+      setMessage({ type: "success", text: "Settings reset to default" });
+      setTimeout(() => setMessage(null), 3000);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (security.newPassword !== security.confirmPassword) {
+      setMessage({ type: "error", text: "New passwords do not match!" });
+      return;
+    }
+    
+    if (security.newPassword.length < 6) {
+      setMessage({ type: "error", text: "Password must be at least 6 characters!" });
+      return;
+    }
+    
+    setSaving(true);
+    
+    try {
+      const userStr = localStorage.getItem("user");
+      let userEmail = null;
+      
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          userEmail = user.email;
+        } catch (e) {}
+      }
+      
+      const response = await fetch(`http://localhost:5000/api/users/change-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: userEmail,
+          currentPassword: security.currentPassword,
+          newPassword: security.newPassword
+        })
+      });
+      
+      if (response.ok) {
+        setMessage({ type: "success", text: "Password changed successfully!" });
+        setSecurity(prev => ({ ...prev, currentPassword: "", newPassword: "", confirmPassword: "" }));
+      } else {
+        throw new Error("Failed to change password");
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: "Failed to change password. Please check your current password." });
+    } finally {
+      setSaving(false);
+      setTimeout(() => setMessage(null), 3000);
+    }
+  };
+
+  if (loading) {
+    return (
+      <ClientHubLayout activeItem="Settings" showProfileActions>
+        <div className="flex items-center justify-center h-[500px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900 mx-auto"></div>
+            <p className="mt-4 text-slate-500">Loading your settings...</p>
+          </div>
+        </div>
+      </ClientHubLayout>
+    );
+  }
 
   return (
     <ClientHubLayout activeItem="Settings" showProfileActions>
       <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
           <div className="max-w-2xl">
-            <p className="text-sm uppercase tracking-[0.28em] text-slate-500">
-              Account settings
-            </p>
-            <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-950">
-              Account Settings
-            </h1>
+            <p className="text-sm uppercase tracking-[0.28em] text-slate-500">Account settings</p>
+            <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-950">Account Settings</h1>
             <p className="mt-4 text-sm leading-7 text-slate-600">
               Manage your account preferences, security, notifications, and personalization options.
             </p>
           </div>
           <div className="grid w-full gap-3 sm:grid-cols-2 xl:w-auto">
-            <button className="h-12 rounded-2xl bg-slate-900 px-5 text-sm font-semibold text-white transition hover:bg-slate-800">
-              Save All Settings
+            <button
+              onClick={saveAllSettings}
+              disabled={saving}
+              className="h-12 rounded-2xl bg-slate-900 px-5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {saving && <Loader className="h-4 w-4 animate-spin" />}
+              {saving ? "Saving..." : "Save All Settings"}
             </button>
             <button
               type="button"
@@ -106,6 +336,12 @@ export default function ClientSetting() {
             </button>
           </div>
         </div>
+        
+        {message && (
+          <div className={`mt-4 p-4 rounded-2xl ${message.type === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
+            {message.text}
+          </div>
+        )}
       </section>
 
       <div className="grid gap-6 xl:grid-cols-[1.45fr_0.75fr]">
@@ -119,7 +355,7 @@ export default function ClientSetting() {
               {[
                 { label: "Full Name", value: personal.fullName, key: "fullName", icon: User },
                 { label: "Company Name", value: personal.company, key: "company", icon: Building2 },
-                { label: "Email Address", value: personal.email, key: "email", icon: Mail },
+                { label: "Email Address", value: personal.email, key: "email", icon: Mail, disabled: true },
                 { label: "Phone Number", value: personal.phone, key: "phone", icon: Phone },
                 { label: "Website", value: personal.website, key: "website", icon: Globe2 },
                 { label: "Industry", value: personal.industry, key: "industry", icon: Sparkles },
@@ -137,13 +373,14 @@ export default function ClientSetting() {
                   </div>
                   <input
                     value={field.value}
+                    disabled={field.disabled}
                     onChange={(event) =>
                       setPersonal((current) => ({
                         ...current,
                         [field.key]: event.target.value,
                       }))
                     }
-                    className="mt-3 w-full bg-transparent text-sm text-slate-900 outline-none"
+                    className="mt-3 w-full bg-transparent text-sm text-slate-900 outline-none disabled:opacity-50"
                   />
                 </label>
               ))}
@@ -157,19 +394,30 @@ export default function ClientSetting() {
           >
             <div className="grid gap-4">
               <PasswordInput
-                label="Change Password"
-                value={security.password}
-                onChange={(value) => setSecurity((current) => ({ ...current, password: value }))}
-                placeholder="New password"
+                label="Current Password"
+                value={security.currentPassword}
+                onChange={(value) => setSecurity((current) => ({ ...current, currentPassword: value }))}
+                placeholder="Enter current password"
+              />
+              <PasswordInput
+                label="New Password"
+                value={security.newPassword}
+                onChange={(value) => setSecurity((current) => ({ ...current, newPassword: value }))}
+                placeholder="New password (min 6 characters)"
               />
               <PasswordInput
                 label="Confirm New Password"
                 value={security.confirmPassword}
-                onChange={(value) =>
-                  setSecurity((current) => ({ ...current, confirmPassword: value }))
-                }
-                placeholder="Confirm password"
+                onChange={(value) => setSecurity((current) => ({ ...current, confirmPassword: value }))}
+                placeholder="Confirm new password"
               />
+              <button
+                onClick={handleChangePassword}
+                disabled={!security.newPassword || !security.confirmPassword || saving}
+                className="h-10 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 disabled:opacity-50"
+              >
+                Change Password
+              </button>
               <ToggleRow
                 label="Enable Two-Factor Authentication"
                 description="Add extra protection for your account sign-ins."
@@ -287,6 +535,7 @@ export default function ClientSetting() {
   );
 }
 
+// Helper Components (same as before)
 function SettingsPanel({ icon: Icon, title, description, children }) {
   return (
     <section className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm">

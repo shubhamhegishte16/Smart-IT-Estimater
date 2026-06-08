@@ -1,172 +1,143 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  ArrowLeft,
-  CalendarDays,
-  CheckCircle2,
-  Download,
-  Layers,
-  Wallet,
-} from "lucide-react";
-import MainNavbar from "../../components/main/MainNavbar";
-
-const money = (value) => {
-  return `Rs ${Number(value || 0).toLocaleString()}`;
-};
+import { Download, FileText, Home, Printer } from "lucide-react";
 
 function Results() {
-  const { state } = useLocation();
-  const navigate = useNavigate();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { estimate, client } = location.state || {};
 
-  if (!state) {
-    return (
-      <div className="min-h-screen bg-[#FFFFFF] text-[#0A0A0A]">
-        <MainNavbar />
-        <main className="mx-auto max-w-4xl px-5 py-16">
-          <div className="rounded-3xl border border-[#E5E5E5] bg-white p-8 text-center shadow-sm">
-            <h1 className="text-3xl font-black">No result found</h1>
-            <p className="mt-3 text-[#666666]">
-              Start a new estimate to generate a project result.
-            </p>
-            <button
-              onClick={() => navigate("/estimations")}
-              className="mt-6 rounded-xl bg-[#0A0A0A] px-5 py-3 text-sm font-bold text-white"
-            >
-              Start Estimate
-            </button>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  const { estimate, client } = state;
-  const projectType = estimate.projectType;
-  const features = estimate.features || [];
-
-  return (
-    <div className="min-h-screen bg-[#FFFFFF] text-[#0A0A0A]">
-      <MainNavbar />
-
-      <main className="mx-auto max-w-6xl px-5 py-10">
-        <button
-          onClick={() => navigate("/estimations")}
-          className="mb-6 inline-flex items-center gap-2 text-sm font-bold text-[#0A0A0A]"
-        >
-          <ArrowLeft size={16} />
-          New estimate
-        </button>
-
-        <section className="rounded-3xl border border-[#E5E5E5] bg-white p-6 shadow-sm md:p-8">
-          <div className="flex flex-col gap-6 border-b border-[#E5E5E5] pb-8 md:flex-row md:items-start md:justify-between">
-            <div>
-              <p className="text-xs font-black uppercase tracking-widest text-[#666666]">
-                Estimate Result
-              </p>
-              <h1 className="mt-3 text-4xl font-black tracking-tight">
-                {projectType?.name || "Project Estimate"}
-              </h1>
-              <p className="mt-3 max-w-2xl text-[#666666]">
-                {client?.clientName || "Client"} has selected {features.length} feature
-                {features.length === 1 ? "" : "s"} for this build.
-              </p>
-            </div>
-
-            <div className="rounded-3xl bg-[#F5F5F5] p-6 text-right">
-              <p className="text-xs font-black uppercase tracking-widest text-[#555555]">
-                Total Estimate
-              </p>
-              <h2 className="mt-2 text-4xl font-black text-[#0A0A0A]">
-                {money(estimate.cost)}
-              </h2>
-            </div>
-          </div>
-
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            <InfoCard icon={Wallet} label="Cost" value={money(estimate.cost)} />
-            <InfoCard
-              icon={CalendarDays}
-              label="Timeline"
-              value={`${estimate.days || 0} days`}
-            />
-            <InfoCard
-              icon={Layers}
-              label="Complexity"
-              value={estimate.complexity || "Low"}
-            />
-          </div>
-
-          <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_0.85fr]">
-            <div className="rounded-3xl border border-[#E5E5E5] bg-[#FAFAFA] p-6">
-              <h2 className="text-xl font-black">Selected features</h2>
-
-              <div className="mt-5 space-y-3">
-                {features.length === 0 ? (
-                  <p className="text-sm text-[#666666]">No extra features selected.</p>
-                ) : (
-                  features.map((feature) => (
-                    <div
-                      key={feature._id}
-                      className="flex items-center justify-between gap-4 rounded-2xl border border-[#E5E5E5] bg-white px-4 py-3"
+    if (!estimate) {
+        return (
+            <div className="min-h-screen bg-white flex items-center justify-center">
+                <div className="text-center">
+                    <p className="text-gray-500">No estimate data found.</p>
+                    <button 
+                        onClick={() => navigate("/estimations")}
+                        className="mt-4 px-4 py-2 bg-black text-white rounded-xl"
                     >
-                      <div className="flex items-center gap-3">
-                        <CheckCircle2 className="text-[#0A0A0A]" size={18} />
-                        <span className="font-bold">{feature.name}</span>
-                      </div>
-                      <span className="font-black text-[#0A0A0A]">
-                        {money(feature.cost)}
-                      </span>
+                        Create New Estimate
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    const handleDownload = () => {
+        alert("Download report functionality will be implemented");
+    };
+
+    const handlePrint = () => {
+        window.print();
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-50">
+            <div className="max-w-4xl mx-auto px-4 py-10">
+                <div className="bg-white rounded-3xl shadow-lg overflow-hidden">
+                    {/* Header */}
+                    <div className="bg-black text-white px-8 py-6">
+                        <h1 className="text-2xl font-bold">Estimate Summary</h1>
+                        <p className="text-gray-300 mt-1">Thank you for choosing our services</p>
                     </div>
-                  ))
-                )}
-              </div>
+
+                    {/* Client Info */}
+                    <div className="px-8 py-6 border-b">
+                        <h2 className="text-lg font-semibold mb-3">Client Information</h2>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <p className="text-sm text-gray-500">Name</p>
+                                <p className="font-medium">{client?.clientName || "N/A"}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500">Email</p>
+                                <p className="font-medium">{client?.clientEmail || "N/A"}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500">Phone</p>
+                                <p className="font-medium">{client?.phone || "N/A"}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500">Company</p>
+                                <p className="font-medium">{client?.company || "N/A"}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Project Details */}
+                    <div className="px-8 py-6 border-b">
+                        <h2 className="text-lg font-semibold mb-3">Project Details</h2>
+                        <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <p className="text-sm text-gray-500">Project Type</p>
+                                <p className="font-medium">{estimate.projectType?.name || "N/A"}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500">Complexity</p>
+                                <p className="font-medium">{estimate.complexity || "Medium"}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500">Timeline</p>
+                                <p className="font-medium">{estimate.days || 0} days</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500">Tech Stack</p>
+                                <p className="font-medium">{estimate.stack || "React + Node.js"}</p>
+                            </div>
+                        </div>
+
+                        {/* Selected Features */}
+                        {estimate.features && estimate.features.length > 0 && (
+                            <div className="mt-4">
+                                <p className="text-sm text-gray-500 mb-2">Selected Features</p>
+                                <div className="space-y-2">
+                                    {estimate.features.map((feature, idx) => (
+                                        <div key={idx} className="flex justify-between py-1">
+                                            <span>{feature.name}</span>
+                                            <span className="font-medium">₹{feature.cost?.toLocaleString() || 0}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Total Cost */}
+                    <div className="px-8 py-6 bg-gray-50">
+                        <div className="flex justify-between items-center">
+                            <span className="text-xl font-bold">Total Estimated Cost</span>
+                            <span className="text-3xl font-black">₹{estimate.cost?.toLocaleString() || 0}</span>
+                        </div>
+                        <p className="text-sm text-gray-500 mt-2">*This is an estimate. Final pricing may vary based on requirements.</p>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="px-8 py-6 flex gap-4">
+                        <button
+                            onClick={handleDownload}
+                            className="flex-1 h-12 rounded-xl bg-black text-white font-semibold flex items-center justify-center gap-2 hover:bg-gray-800"
+                        >
+                            <Download size={18} />
+                            Download PDF
+                        </button>
+                        <button
+                            onClick={handlePrint}
+                            className="flex-1 h-12 rounded-xl border border-gray-300 font-semibold flex items-center justify-center gap-2 hover:bg-gray-50"
+                        >
+                            <Printer size={18} />
+                            Print
+                        </button>
+                        <button
+                            onClick={() => navigate("/estimations")}
+                            className="flex-1 h-12 rounded-xl border border-gray-300 font-semibold flex items-center justify-center gap-2 hover:bg-gray-50"
+                        >
+                            <Home size={18} />
+                            New Estimate
+                        </button>
+                    </div>
+                </div>
             </div>
-
-            <div className="rounded-3xl border border-[#E5E5E5] bg-white p-6">
-              <h2 className="text-xl font-black">Client details</h2>
-              <div className="mt-5 space-y-3 text-sm">
-                <SummaryLine label="Name" value={client?.clientName || "-"} />
-                <SummaryLine label="Email" value={client?.clientEmail || "-"} />
-                <SummaryLine label="Phone" value={client?.phone || "-"} />
-                <SummaryLine label="Company" value={client?.company || "-"} />
-                <SummaryLine label="Stack" value={estimate.stack || "-"} />
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-8 flex justify-end border-t border-[#E5E5E5] pt-6">
-            <button
-              type="button"
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#0A0A0A] px-6 text-sm font-bold text-white transition hover:bg-black/90"
-            >
-              <Download size={18} />
-              Download PDF
-            </button>
-          </div>
-        </section>
-      </main>
-    </div>
-  );
-}
-
-function InfoCard({ icon: Icon, label, value }) {
-  return (
-    <div className="rounded-3xl border border-[#E5E5E5] bg-[#FAFAFA] p-5">
-      <Icon className="text-[#0A0A0A]" size={22} />
-      <p className="mt-4 text-xs font-black uppercase tracking-widest text-[#666666]">
-        {label}
-      </p>
-      <p className="mt-2 text-2xl font-black">{value}</p>
-    </div>
-  );
-}
-
-function SummaryLine({ label, value }) {
-  return (
-    <div className="flex items-center justify-between gap-4 rounded-2xl bg-[#FFFFFF] px-4 py-3">
-      <span className="text-[#666666]">{label}</span>
-      <span className="text-right font-bold text-[#0A0A0A]">{value}</span>
-    </div>
-  );
+        </div>
+    );
 }
 
 export default Results;

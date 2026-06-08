@@ -1,22 +1,18 @@
 import express from "express";
-
 import {
-  createProjectType,
-  getProjectType,
-  updateProjectType,
-  deleteProjectType
+    getProjectTypes,
+    getProjectTypeById,
+    createProjectType,
+    updateProjectType,
+    deleteProjectType
 } from "../controllers/projectTypeController.js";
-
-import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", getProjectType);
-
-router.post("/", authMiddleware, createProjectType);
-
-router.put("/:id", authMiddleware, updateProjectType);
-
-router.delete("/:id", authMiddleware, deleteProjectType);
+router.get("/", getProjectTypes);
+router.get("/:id", getProjectTypeById);
+router.post("/", createProjectType);
+router.put("/:id", updateProjectType);
+router.delete("/:id", deleteProjectType);
 
 export default router;

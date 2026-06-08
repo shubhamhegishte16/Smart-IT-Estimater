@@ -6,6 +6,7 @@ import dashboardRoutes from './routes/dashbooardRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import estimationRoutes from "./routes/estimationRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -26,6 +27,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/estimations", estimationRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend Running Successfully");
