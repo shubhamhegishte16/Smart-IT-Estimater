@@ -13,18 +13,20 @@ dotenv.config();
 
 const app = express();
 
-const allowedOrigins = (
-  process.env.CLIENT_ORIGIN ||
-  "http://localhost:5173,https://beacon-smart-estimation.vercel.app"
-)
-  .split(",")
-  .map((origin) => origin.trim())
+const normalizeOrigin = (origin) => origin.trim().replace(/\/$/, "");
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://beacon-smart-estimation.vercel.app",
+  ...(process.env.CLIENT_ORIGIN || "").split(","),
+]
+  .map(normalizeOrigin)
   .filter(Boolean);
 
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(normalizeOrigin(origin))) {
         callback(null, true);
         return;
       }
