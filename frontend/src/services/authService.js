@@ -1,44 +1,51 @@
-import { API_BASE_URL, requestJson } from "./api";
+// services/authService.js
+const API_BASE_URL = "http://localhost:5000/api";
 
-const API_URL = `${API_BASE_URL}/auth`;
+export const registerUser = async (name, email, password, role, company, phone) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                name, 
+                email, 
+                password, 
+                role,
+                company: company || "",
+                phone: phone || ""
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || "Registration failed");
+        }
+        
+        return data;
+    } catch (error) {
+        console.error("Registration error:", error);
+        throw error;
+    }
+};
 
 export const loginUser = async (email, password) => {
-  return requestJson(`${API_URL}/login`, {
-    method: "POST",
-    body: JSON.stringify({
-      email,
-      password,
-    }),
-  });
-};
-
-export const registerUser = async (
-  name,
-  email,
-  password,
-  role
-) => {
-  return requestJson(`${API_URL}/register`, {
-    method: "POST",
-    body: JSON.stringify({
-      name,
-      email,
-      password,
-      role,
-    }),
-  });
-};
-
-export const logoutUser = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-};
-
-export const getToken = () => {
-  return localStorage.getItem("token");
-};
-
-export const getCurrentUser = () => {
-  const user = localStorage.getItem("user");
-  return user ? JSON.parse(user) : null;
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || "Login failed");
+        }
+        
+        return data;
+    } catch (error) {
+        console.error("Login error:", error);
+        throw error;
+    }
 };

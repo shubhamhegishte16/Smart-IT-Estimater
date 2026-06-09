@@ -9,9 +9,12 @@ function Signup() {
     email: "",
     password: "",
     confirmPassword: "",
+    company: "",
+    phone: "",
     role: "client"
   });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const updateField = (event) => {
     const { name, value } = event.target;
@@ -20,52 +23,61 @@ function Signup() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
     setError("");
+    setLoading(true);
 
+    // Validation
     if (form.password.length < 6) {
       setError("Password must be at least 6 characters.");
+      setLoading(false);
       return;
     }
 
     if (form.password !== form.confirmPassword) {
       setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
+    if (!form.company) {
+      setError("Company name is required.");
+      setLoading(false);
+      return;
+    }
+
+    if (!form.phone) {
+      setError("Phone number is required.");
+      setLoading(false);
       return;
     }
 
     try {
-
+      // Register with company and phone
       await registerUser(
         form.name,
         form.email,
         form.password,
-        form.role
+        form.role,
+        form.company,
+        form.phone
       );
 
-      const data = await loginUser(
-        form.email,
-        form.password
-      );
+      // Auto login after registration
+      const data = await loginUser(form.email, form.password);
 
-      localStorage.setItem(
-        "token",
-        data.token
-      );
-
-      localStorage.setItem(
-        "user",
-        JSON.stringify(data.user)
-      );
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("userEmail", data.user.email);
+      localStorage.setItem("userName", data.user.name);
+      localStorage.setItem("userCompany", data.user.company);
+      localStorage.setItem("userPhone", data.user.phone);
 
       navigate("/client/dashboard");
 
     } catch (error) {
-
-      setError(
-        error.message ||
-        "Registration failed"
-      );
-
+      setError(error.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -90,8 +102,9 @@ function Signup() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Full Name */}
               <label className="block">
-                <span className="mb-2 block text-sm font-semibold text-black/70">Full name</span>
+                <span className="mb-2 block text-sm font-semibold text-black/70">Full name *</span>
                 <input
                   className="h-12 w-full rounded-xl border border-black/10 bg-white px-4 text-sm text-[#0A0A0A] outline-none transition placeholder:text-gray-400 focus:border-black focus:ring-4 focus:ring-black/10"
                   name="name"
@@ -103,8 +116,9 @@ function Signup() {
                 />
               </label>
 
+              {/* Email */}
               <label className="block">
-                <span className="mb-2 block text-sm font-semibold text-black/70">Email address</span>
+                <span className="mb-2 block text-sm font-semibold text-black/70">Email address *</span>
                 <input
                   className="h-12 w-full rounded-xl border border-black/10 bg-white px-4 text-sm text-[#0A0A0A] outline-none transition placeholder:text-gray-400 focus:border-black focus:ring-4 focus:ring-black/10"
                   name="email"
@@ -116,24 +130,51 @@ function Signup() {
                 />
               </label>
 
-              
+              {/* Company Name */}
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-black/70">Company name *</span>
+                <input
+                  className="h-12 w-full rounded-xl border border-black/10 bg-white px-4 text-sm text-[#0A0A0A] outline-none transition placeholder:text-gray-400 focus:border-black focus:ring-4 focus:ring-black/10"
+                  name="company"
+                  type="text"
+                  value={form.company}
+                  onChange={updateField}
+                  placeholder="Your company name"
+                  required
+                />
+              </label>
 
+              {/* Phone Number */}
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-black/70">Phone number *</span>
+                <input
+                  className="h-12 w-full rounded-xl border border-black/10 bg-white px-4 text-sm text-[#0A0A0A] outline-none transition placeholder:text-gray-400 focus:border-black focus:ring-4 focus:ring-black/10"
+                  name="phone"
+                  type="tel"
+                  value={form.phone}
+                  onChange={updateField}
+                  placeholder="+91 98765 43210"
+                  required
+                />
+              </label>
+
+              {/* Password Fields */}
               <div className="grid gap-5 sm:grid-cols-2">
                 <label className="block">
-                  <span className="mb-2 block text-sm font-semibold text-black/70">Password</span>
+                  <span className="mb-2 block text-sm font-semibold text-black/70">Password *</span>
                   <input
                     className="h-12 w-full rounded-xl border border-black/10 bg-white px-4 text-sm text-[#0A0A0A] outline-none transition placeholder:text-gray-400 focus:border-black focus:ring-4 focus:ring-black/10"
                     name="password"
                     type="password"
                     value={form.password}
                     onChange={updateField}
-                    placeholder="Minimum 6"
+                    placeholder="Minimum 6 characters"
                     required
                   />
                 </label>
 
                 <label className="block">
-                  <span className="mb-2 block text-sm font-semibold text-black/70">Confirm</span>
+                  <span className="mb-2 block text-sm font-semibold text-black/70">Confirm password *</span>
                   <input
                     className="h-12 w-full rounded-xl border border-black/10 bg-white px-4 text-sm text-[#0A0A0A] outline-none transition placeholder:text-gray-400 focus:border-black focus:ring-4 focus:ring-black/10"
                     name="confirmPassword"
@@ -146,17 +187,20 @@ function Signup() {
                 </label>
               </div>
 
+              {/* Error Message */}
               {error && (
                 <p className="rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
                   {error}
                 </p>
               )}
 
+              {/* Submit Button */}
               <button
-                className="h-12 w-full rounded-xl bg-[#0A0A0A] text-sm font-black text-white transition hover:-translate-y-0.5 hover:bg-black/90"
+                className="h-12 w-full rounded-xl bg-[#0A0A0A] text-sm font-black text-white transition hover:-translate-y-0.5 hover:bg-black/90 disabled:opacity-50 disabled:cursor-not-allowed"
                 type="submit"
+                disabled={loading}
               >
-                Create account
+                {loading ? "Creating account..." : "Create account"}
               </button>
             </form>
 
@@ -205,5 +249,3 @@ function Signup() {
 }
 
 export default Signup;
-
-
