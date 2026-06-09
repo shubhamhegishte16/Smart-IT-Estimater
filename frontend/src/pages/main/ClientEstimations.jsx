@@ -23,80 +23,114 @@ function ClientEstimations() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const handleDownload = (estimate) => {
-    const doc = new jsPDF();
+  // In ClientEstimations.jsx, replace the existing handleDownload with this:
 
-    // Header
-    doc.setFillColor(15, 23, 42);
-    doc.rect(0, 0, 210, 30, "F");
+  const handleDownload = async (estimate) => {
+    try {
+      // Show loading state
+      const downloadBtn = document.activeElement;
+      if (downloadBtn) downloadBtn.disabled = true;
 
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(20);
-    doc.text("SMART IT ESTIMATION SYSTEM", 15, 18);
+      // Fetch complete estimation data with populated fields
+      const response = await fetch(`http://localhost:5000/api/estimations/${estimate._id}`);
 
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(16);
-    doc.text("Project Estimation Report", 15, 45);
+      if (!response.ok) {
+        throw new Error("Failed to fetch estimate data");
+      }
 
-    doc.setFontSize(10);
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 15, 53);
-    doc.text(`Estimate ID: ${estimate._id?.slice(-8).toUpperCase()}`, 150, 53);
+      const data = await response.json();
+      const est = data.estimation || data;
 
-    // Client Details Table
-    autoTable(doc, {
-      startY: 60,
-      head: [["Client Information", "Details"]],
-      body: [
-        ["Client Name", estimate.clientName || "N/A"],
-        ["Email", estimate.clientEmail || "N/A"],
-        ["Phone", estimate.phone || "N/A"],
-        ["Company", estimate.company || "N/A"],
-        ["Complexity", estimate.complexity || "N/A"],
-      ],
-      theme: "striped",
-      headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] },
-    });
+      // Create PDF
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
 
-    // Project Details Table
-    autoTable(doc, {
-      startY: doc.lastAutoTable.finalY + 10,
-      head: [["Project Details", "Value"]],
-      body: [
-        ["Project Type", estimate.projectType?.name || "N/A"],
-        ["Timeline", `${estimate.totalDays || 0} Days`],
-        ["Total Cost", `₹${estimate.totalCost?.toLocaleString() || 0}`],
-        ["Status", estimate.status || "draft"],
-      ],
-      theme: "striped",
-      headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] },
-    });
+      // Header
+      doc.setFillColor(15, 23, 42);
+      doc.rect(0, 0, pageWidth, 40, "F");
 
-    // Features Table
-    if (estimate.features && estimate.features.length > 0) {
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(22);
+      doc.setFont("helvetica", "bold");
+      doc.text("SMART IT ESTIMATION SYSTEM", 15, 25);
+
+      // Title
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(18);
+      doc.setFont("helvetica", "bold");
+      doc.text("Project Estimation Report", 15, 55);
+
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 15, 65);
+      doc.text(`Estimate ID: ${est._id?.slice(-8).toUpperCase()}`, pageWidth - 50, 65);
+
+      // Client Details Table
       autoTable(doc, {
-        startY: doc.lastAutoTable.finalY + 10,
-        head: [["Selected Features", "Cost"]],
-        body: estimate.features.map(f => [f.name, `₹${(f.cost || 0).toLocaleString()}`]),
+        startY: 80,
+        head: [["CLIENT INFORMATION", "DETAILS"]],
+        body: [
+          ["Client Name", est.clientName || "N/A"],
+          ["Email", est.clientEmail || "N/A"],
+          ["Complexity", est.complexity || "Medium"],
+        ],
         theme: "striped",
         headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] },
+        margin: { left: 15, right: 15 }
       });
+
+      // Project Details Table
+      autoTable(doc, {
+        startY: doc.lastAutoTable.finalY + 10,
+        head: [["PROJECT DETAILS", "VALUE"]],
+        body: [
+          ["Project Type", est.projectType?.name || "N/A"],
+          ["Timeline", `${est.totalDays || 0} Days`],
+          ["Total Cost", `₹${(est.totalCost || 0).toLocaleString('en-IN')}`],
+        ],
+        theme: "striped",
+        headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] },
+        margin: { left: 15, right: 15 }
+      });
+
+      // Features Table
+      if (est.features && est.features.length > 0) {
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 10,
+          head: [["SELECTED FEATURES", "COST"]],
+          body: est.features.map(f => [f.name, `₹${(f.cost || 0).toLocaleString('en-IN')}`]),
+          foot: [["Total", `₹${(est.totalCost || 0).toLocaleString('en-IN')}`]],
+          theme: "striped",
+          headStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] },
+          footStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: "bold" },
+          margin: { left: 15, right: 15 }
+        });
+      }
+
+      // Footer
+      const finalY = doc.lastAutoTable.finalY + 20;
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.text(
+        "This is a computer-generated estimate. For any queries, please contact support.",
+        15,
+        finalY
+      );
+
+      // Save file
+      const fileName = `${est.clientName || 'estimate'}_${est._id?.slice(-6)}.pdf`;
+      doc.save(fileName);
+
+      alert(`✅ PDF Downloaded: ${fileName}`);
+
+    } catch (err) {
+      console.error("Download error:", err);
+      alert("❌ Failed to download PDF. Please try again.");
+    } finally {
+      const downloadBtn = document.activeElement;
+      if (downloadBtn) downloadBtn.disabled = false;
     }
-
-    // Footer
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.text(
-      "This is a computer-generated estimate. For any queries, please contact support.",
-      15,
-      doc.lastAutoTable.finalY + 20
-    );
-    doc.text(
-      "Generated by Smart IT Estimation System",
-      15,
-      doc.lastAutoTable.finalY + 30
-    );
-
-    doc.save(`${estimate.clientName || "client"}_estimate_${estimate._id?.slice(-6)}.pdf`);
   };
 
   useEffect(() => {
@@ -104,14 +138,14 @@ function ClientEstimations() {
       try {
         const userStr = localStorage.getItem("user");
         let userEmail = null;
-        
+
         if (userStr) {
           try {
             const user = JSON.parse(userStr);
             userEmail = user.email;
-          } catch (e) {}
+          } catch (e) { }
         }
-        
+
         if (!userEmail) {
           userEmail = localStorage.getItem("userEmail") || "shubham@example.com";
         }
@@ -131,12 +165,12 @@ function ClientEstimations() {
   // Filter estimates based on search and status
   const filteredEstimates = estimates.filter(estimate => {
     // Search filter
-    const matchesSearch = 
+    const matchesSearch =
       estimate.clientName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       estimate.projectType?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       estimate._id?.slice(-6).toLowerCase().includes(searchTerm.toLowerCase()) ||
       estimate.complexity?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     // Status filter
     let matchesStatus = true;
     if (statusFilter === "open") {
@@ -146,7 +180,7 @@ function ClientEstimations() {
     } else {
       matchesStatus = statusFilter === "all";
     }
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -227,31 +261,28 @@ function ClientEstimations() {
           <div className="flex gap-2">
             <button
               onClick={() => setStatusFilter("all")}
-              className={`rounded-xl px-4 py-2.5 text-xs font-semibold transition ${
-                statusFilter === "all"
+              className={`rounded-xl px-4 py-2.5 text-xs font-semibold transition ${statusFilter === "all"
                   ? "bg-slate-900 text-white shadow-md"
                   : "bg-slate-50 text-slate-600 hover:bg-slate-100"
-              }`}
+                }`}
             >
               All ({counts.total})
             </button>
             <button
               onClick={() => setStatusFilter("open")}
-              className={`rounded-xl px-4 py-2.5 text-xs font-semibold transition ${
-                statusFilter === "open"
+              className={`rounded-xl px-4 py-2.5 text-xs font-semibold transition ${statusFilter === "open"
                   ? "bg-amber-500 text-white shadow-md"
                   : "bg-slate-50 text-slate-600 hover:bg-slate-100"
-              }`}
+                }`}
             >
               Open ({counts.open})
             </button>
             <button
               onClick={() => setStatusFilter("closed")}
-              className={`rounded-xl px-4 py-2.5 text-xs font-semibold transition ${
-                statusFilter === "closed"
+              className={`rounded-xl px-4 py-2.5 text-xs font-semibold transition ${statusFilter === "closed"
                   ? "bg-emerald-500 text-white shadow-md"
                   : "bg-slate-50 text-slate-600 hover:bg-slate-100"
-              }`}
+                }`}
             >
               Closed ({counts.closed})
             </button>
@@ -279,7 +310,7 @@ function ClientEstimations() {
               <div className="text-5xl mb-3">📋</div>
               <p className="text-slate-500 font-medium">No estimates found</p>
               <p className="text-sm text-slate-400 mt-1">
-                {searchTerm || statusFilter !== "all" 
+                {searchTerm || statusFilter !== "all"
                   ? "Try adjusting your search or filter criteria"
                   : "Create your first estimate to get started"}
               </p>
@@ -337,11 +368,10 @@ function ClientEstimations() {
                       </td>
                       <td className="px-4 py-4 text-slate-600">{estimate.totalDays || 0} Days</td>
                       <td className="px-4 py-4">
-                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                          estimate.complexity === "High" ? "bg-red-100 text-red-700" :
-                          estimate.complexity === "Medium" ? "bg-yellow-100 text-yellow-700" :
-                          "bg-green-100 text-green-700"
-                        }`}>
+                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${estimate.complexity === "High" ? "bg-red-100 text-red-700" :
+                            estimate.complexity === "Medium" ? "bg-yellow-100 text-yellow-700" :
+                              "bg-green-100 text-green-700"
+                          }`}>
                           {estimate.complexity || "Medium"}
                         </span>
                       </td>
@@ -351,10 +381,10 @@ function ClientEstimations() {
                         </span>
                       </td>
                       <td className="px-4 py-4 text-slate-600">
-                        {new Date(estimate.createdAt).toLocaleDateString('en-US', { 
-                          year: 'numeric', 
-                          month: 'short', 
-                          day: 'numeric' 
+                        {new Date(estimate.createdAt).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
                         })}
                       </td>
                       <td className="px-4 py-4">
@@ -439,11 +469,10 @@ function ClientEstimations() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-slate-500">Complexity</p>
-                  <p className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
-                    selectedEstimate.complexity === "High" ? "bg-red-100 text-red-700" :
-                    selectedEstimate.complexity === "Medium" ? "bg-yellow-100 text-yellow-700" :
-                    "bg-green-100 text-green-700"
-                  }`}>
+                  <p className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${selectedEstimate.complexity === "High" ? "bg-red-100 text-red-700" :
+                      selectedEstimate.complexity === "Medium" ? "bg-yellow-100 text-yellow-700" :
+                        "bg-green-100 text-green-700"
+                    }`}>
                     {selectedEstimate.complexity || "Medium"}
                   </p>
                 </div>
