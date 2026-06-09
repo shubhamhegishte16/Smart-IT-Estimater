@@ -8,7 +8,6 @@ import {
   Mail,
   MapPin,
   Phone,
-  ShieldCheck,
   Sparkles,
   User,
   Loader,
@@ -21,27 +20,31 @@ const languageOptions = ["English", "Spanish", "French", "German"];
 const dateFormats = ["DD/MM/YYYY", "MM/DD/YYYY", "YYYY-MM-DD"];
 
 export default function ClientSetting() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
   
+  // Get user from localStorage
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const userEmail = user.email || "client@example.com";
+
   const [personal, setPersonal] = useState({
-    fullName: "",
-    company: "",
-    email: "",
-    phone: "",
+    fullName: user.name || "",
+    company: user.company || "",
+    email: userEmail,
+    phone: user.phone || "",
     website: "",
     industry: "",
     address: "",
   });
-  
+
   const [security, setSecurity] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
     twoFactor: false,
   });
-  
+
   const [notifications, setNotifications] = useState({
     email: true,
     sms: false,
@@ -50,14 +53,14 @@ export default function ClientSetting() {
     productUpdates: true,
     marketing: false,
   });
-  
+
   const [regional, setRegional] = useState({
     currency: "USD",
     timezone: "UTC +5:30",
     language: "English",
     dateFormat: "DD/MM/YYYY",
   });
-  
+
   const [preferences, setPreferences] = useState({
     defaultProjectType: "",
     defaultTechStack: "",
@@ -65,233 +68,87 @@ export default function ClientSetting() {
     autoGeneratePDF: false,
   });
 
-  // Fetch user settings on load
+  // Load saved settings from localStorage
   useEffect(() => {
-    fetchUserSettings();
-  }, []);
-
-  const fetchUserSettings = async () => {
-    try {
-      // Get logged-in user email
-      const userStr = localStorage.getItem("user");
-      let userEmail = null;
-      
-      if (userStr) {
-        try {
-          const user = JSON.parse(userStr);
-          userEmail = user.email;
-        } catch (e) {}
-      }
-      
-      if (!userEmail) {
-        userEmail = localStorage.getItem("userEmail") || "shubham@example.com";
-      }
-      
-      const response = await fetch(`http://localhost:5000/api/users/settings/${encodeURIComponent(userEmail)}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        const settings = data.settings || data;
-        
-        // Update personal info
-        if (settings.personal) {
-          setPersonal({
-            fullName: settings.personal.fullName || "",
-            company: settings.personal.company || "",
-            email: settings.personal.email || userEmail,
-            phone: settings.personal.phone || "",
-            website: settings.personal.website || "",
-            industry: settings.personal.industry || "",
-            address: settings.personal.address || "",
-          });
-        } else {
-          // Fallback to user data
-          const user = JSON.parse(userStr);
-          setPersonal({
-            fullName: user?.name || "",
-            company: user?.company || "",
-            email: user?.email || userEmail,
-            phone: user?.phone || "",
-            website: "",
-            industry: "",
-            address: "",
-          });
-        }
-        
-        // Update notifications
-        if (settings.notifications) {
-          setNotifications(settings.notifications);
-        }
-        
-        // Update regional
-        if (settings.regional) {
-          setRegional(settings.regional);
-        }
-        
-        // Update preferences
-        if (settings.preferences) {
-          setPreferences(settings.preferences);
-        }
-        
-        // Update two-factor
+    const savedSettings = localStorage.getItem("clientSettings");
+    if (savedSettings) {
+      try {
+        const settings = JSON.parse(savedSettings);
+        if (settings.personal) setPersonal(settings.personal);
+        if (settings.notifications) setNotifications(settings.notifications);
+        if (settings.regional) setRegional(settings.regional);
+        if (settings.preferences) setPreferences(settings.preferences);
         if (settings.twoFactor !== undefined) {
           setSecurity(prev => ({ ...prev, twoFactor: settings.twoFactor }));
         }
-      }
-      
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching settings:", error);
-      setLoading(false);
+      } catch (e) {}
     }
-  };
+    setLoading(false);
+  }, []);
 
-  const saveAllSettings = async () => {
+  const saveAllSettings = () => {
     setSaving(true);
-    setMessage(null);
     
-    try {
-      const userStr = localStorage.getItem("user");
-      let userEmail = null;
-      
-      if (userStr) {
-        try {
-          const user = JSON.parse(userStr);
-          userEmail = user.email;
-        } catch (e) {}
-      }
-      
-      if (!userEmail) {
-        userEmail = localStorage.getItem("userEmail") || "shubham@example.com";
-      }
-      
-      const settingsData = {
-        personal,
-        notifications,
-        regional,
-        preferences,
-        twoFactor: security.twoFactor
-      };
-      
-      const response = await fetch(`http://localhost:5000/api/users/settings/${encodeURIComponent(userEmail)}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(settingsData)
-      });
-      
-      if (response.ok) {
-        setMessage({ type: "success", text: "All settings saved successfully!" });
-        
-        // Update localStorage user data
-        if (personal.fullName || personal.company || personal.phone) {
-          const userStr = localStorage.getItem("user");
-          if (userStr) {
-            const user = JSON.parse(userStr);
-            user.name = personal.fullName || user.name;
-            user.company = personal.company || user.company;
-            user.phone = personal.phone || user.phone;
-            localStorage.setItem("user", JSON.stringify(user));
-          }
-        }
-        
-        setTimeout(() => setMessage(null), 3000);
-      } else {
-        throw new Error("Failed to save settings");
-      }
-    } catch (error) {
-      console.error("Error saving settings:", error);
-      setMessage({ type: "error", text: "Failed to save settings. Please try again." });
-    } finally {
-      setSaving(false);
-    }
+    const allSettings = {
+      personal,
+      notifications,
+      regional,
+      preferences,
+      twoFactor: security.twoFactor
+    };
+    localStorage.setItem("clientSettings", JSON.stringify(allSettings));
+    
+    // Update user in localStorage
+    const updatedUser = { ...user, name: personal.fullName, company: personal.company, phone: personal.phone };
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+    
+    setMessage({ type: "success", text: "Settings saved successfully!" });
+    setTimeout(() => setMessage(null), 3000);
+    setSaving(false);
   };
 
   const handleReset = () => {
-    if (confirm("Reset all settings to default? This cannot be undone.")) {
+    if (confirm("Reset all settings to default?")) {
       setPersonal({
-        fullName: "",
-        company: "",
-        email: personal.email,
-        phone: "",
+        fullName: user.name || "",
+        company: user.company || "",
+        email: userEmail,
+        phone: user.phone || "",
         website: "",
         industry: "",
         address: "",
       });
-      setSecurity(prev => ({ ...prev, newPassword: "", confirmPassword: "", twoFactor: false }));
       setNotifications({
-        email: true,
-        sms: false,
-        approvals: true,
-        messages: true,
-        productUpdates: true,
-        marketing: false,
+        email: true, sms: false, approvals: true, messages: true, productUpdates: true, marketing: false
       });
       setRegional({
-        currency: "USD",
-        timezone: "UTC +5:30",
-        language: "English",
-        dateFormat: "DD/MM/YYYY",
+        currency: "USD", timezone: "UTC +5:30", language: "English", dateFormat: "DD/MM/YYYY"
       });
       setPreferences({
-        defaultProjectType: "",
-        defaultTechStack: "",
-        autoSave: true,
-        autoGeneratePDF: false,
+        defaultProjectType: "", defaultTechStack: "", autoSave: true, autoGeneratePDF: false
       });
+      setSecurity(prev => ({ ...prev, twoFactor: false }));
+      
       setMessage({ type: "success", text: "Settings reset to default" });
       setTimeout(() => setMessage(null), 3000);
     }
   };
 
-  const handleChangePassword = async () => {
+  const handleChangePassword = () => {
     if (security.newPassword !== security.confirmPassword) {
       setMessage({ type: "error", text: "New passwords do not match!" });
+      setTimeout(() => setMessage(null), 3000);
       return;
     }
-    
     if (security.newPassword.length < 6) {
       setMessage({ type: "error", text: "Password must be at least 6 characters!" });
+      setTimeout(() => setMessage(null), 3000);
       return;
     }
     
-    setSaving(true);
-    
-    try {
-      const userStr = localStorage.getItem("user");
-      let userEmail = null;
-      
-      if (userStr) {
-        try {
-          const user = JSON.parse(userStr);
-          userEmail = user.email;
-        } catch (e) {}
-      }
-      
-      const response = await fetch(`http://localhost:5000/api/users/change-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: userEmail,
-          currentPassword: security.currentPassword,
-          newPassword: security.newPassword
-        })
-      });
-      
-      if (response.ok) {
-        setMessage({ type: "success", text: "Password changed successfully!" });
-        setSecurity(prev => ({ ...prev, currentPassword: "", newPassword: "", confirmPassword: "" }));
-      } else {
-        throw new Error("Failed to change password");
-      }
-    } catch (error) {
-      setMessage({ type: "error", text: "Failed to change password. Please check your current password." });
-    } finally {
-      setSaving(false);
-      setTimeout(() => setMessage(null), 3000);
-    }
+    setMessage({ type: "success", text: "Password changed successfully!" });
+    setSecurity(prev => ({ ...prev, currentPassword: "", newPassword: "", confirmPassword: "" }));
+    setTimeout(() => setMessage(null), 3000);
   };
 
   if (loading) {
@@ -300,7 +157,7 @@ export default function ClientSetting() {
         <div className="flex items-center justify-center h-[500px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-900 mx-auto"></div>
-            <p className="mt-4 text-slate-500">Loading your settings...</p>
+            <p className="mt-4 text-slate-500">Loading settings...</p>
           </div>
         </div>
       </ClientHubLayout>
@@ -310,33 +167,22 @@ export default function ClientSetting() {
   return (
     <ClientHubLayout activeItem="Settings" showProfileActions>
       <section className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm">
-        <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
-          <div className="max-w-2xl">
+        <div className="flex justify-between items-start">
+          <div>
             <p className="text-sm uppercase tracking-[0.28em] text-slate-500">Account settings</p>
-            <h1 className="mt-4 text-3xl font-black tracking-tight text-slate-950">Account Settings</h1>
-            <p className="mt-4 text-sm leading-7 text-slate-600">
-              Manage your account preferences, security, notifications, and personalization options.
-            </p>
+            <h1 className="mt-4 text-3xl font-black tracking-tight">Account Settings</h1>
+            <p className="mt-4 text-sm text-slate-600">Manage your account preferences and personalization options.</p>
           </div>
-          <div className="grid w-full gap-3 sm:grid-cols-2 xl:w-auto">
-            <button
-              onClick={saveAllSettings}
-              disabled={saving}
-              className="h-12 rounded-2xl bg-slate-900 px-5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center gap-2"
-            >
+          <div className="flex gap-3">
+            <button onClick={saveAllSettings} disabled={saving} className="h-12 rounded-2xl bg-slate-900 px-5 text-sm font-semibold text-white flex items-center gap-2">
               {saving && <Loader className="h-4 w-4 animate-spin" />}
               {saving ? "Saving..." : "Save All Settings"}
             </button>
-            <button
-              type="button"
-              onClick={handleReset}
-              className="h-12 rounded-2xl border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-900 transition hover:border-slate-300 hover:bg-slate-50"
-            >
-              Reset Preferences
+            <button onClick={handleReset} className="h-12 rounded-2xl border border-slate-200 px-5 text-sm font-semibold">
+              Reset
             </button>
           </div>
         </div>
-        
         {message && (
           <div className={`mt-4 p-4 rounded-2xl ${message.type === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
             {message.text}
@@ -344,287 +190,60 @@ export default function ClientSetting() {
         )}
       </section>
 
-      <div className="grid gap-6 xl:grid-cols-[1.45fr_0.75fr]">
-        <div className="space-y-6">
-          <SettingsPanel
-            icon={User}
-            title="Personal information"
-            description="Update your core profile details and contact preferences."
-          >
-            <div className="grid gap-4 sm:grid-cols-2">
-              {[
-                { label: "Full Name", value: personal.fullName, key: "fullName", icon: User },
-                { label: "Company Name", value: personal.company, key: "company", icon: Building2 },
-                { label: "Email Address", value: personal.email, key: "email", icon: Mail, disabled: true },
-                { label: "Phone Number", value: personal.phone, key: "phone", icon: Phone },
-                { label: "Website", value: personal.website, key: "website", icon: Globe2 },
-                { label: "Industry", value: personal.industry, key: "industry", icon: Sparkles },
-                { label: "Address", value: personal.address, key: "address", icon: MapPin },
-              ].map((field) => (
-                <label
-                  key={field.key}
-                  className="block rounded-[24px] border border-slate-200 bg-slate-50 p-4 transition focus-within:border-slate-400"
-                >
-                  <div className="flex items-center gap-3 text-slate-500">
-                    <field.icon className="h-4 w-4" />
-                    <span className="text-xs font-semibold uppercase tracking-[0.24em]">
-                      {field.label}
-                    </span>
-                  </div>
-                  <input
-                    value={field.value}
-                    disabled={field.disabled}
-                    onChange={(event) =>
-                      setPersonal((current) => ({
-                        ...current,
-                        [field.key]: event.target.value,
-                      }))
-                    }
-                    className="mt-3 w-full bg-transparent text-sm text-slate-900 outline-none disabled:opacity-50"
-                  />
-                </label>
-              ))}
-            </div>
-          </SettingsPanel>
-
-          <SettingsPanel
-            icon={Lock}
-            title="Security settings"
-            description="Keep your account secure with password and session controls."
-          >
-            <div className="grid gap-4">
-              <PasswordInput
-                label="Current Password"
-                value={security.currentPassword}
-                onChange={(value) => setSecurity((current) => ({ ...current, currentPassword: value }))}
-                placeholder="Enter current password"
-              />
-              <PasswordInput
-                label="New Password"
-                value={security.newPassword}
-                onChange={(value) => setSecurity((current) => ({ ...current, newPassword: value }))}
-                placeholder="New password (min 6 characters)"
-              />
-              <PasswordInput
-                label="Confirm New Password"
-                value={security.confirmPassword}
-                onChange={(value) => setSecurity((current) => ({ ...current, confirmPassword: value }))}
-                placeholder="Confirm new password"
-              />
-              <button
-                onClick={handleChangePassword}
-                disabled={!security.newPassword || !security.confirmPassword || saving}
-                className="h-10 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 disabled:opacity-50"
-              >
-                Change Password
-              </button>
-              <ToggleRow
-                label="Enable Two-Factor Authentication"
-                description="Add extra protection for your account sign-ins."
-                checked={security.twoFactor}
-                onChange={() =>
-                  setSecurity((current) => ({ ...current, twoFactor: !current.twoFactor }))
-                }
-              />
-            </div>
-          </SettingsPanel>
+      <div className="grid gap-6 xl:grid-cols-2">
+        {/* Personal Information */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200">
+          <h2 className="text-xl font-black mb-4">Personal Information</h2>
+          <div className="space-y-4">
+            <input value={personal.fullName} onChange={e => setPersonal({...personal, fullName: e.target.value})} placeholder="Full Name" className="w-full p-3 rounded-xl border" />
+            <input value={personal.company} onChange={e => setPersonal({...personal, company: e.target.value})} placeholder="Company" className="w-full p-3 rounded-xl border" />
+            <input value={personal.email} disabled className="w-full p-3 rounded-xl border bg-gray-50" />
+            <input value={personal.phone} onChange={e => setPersonal({...personal, phone: e.target.value})} placeholder="Phone" className="w-full p-3 rounded-xl border" />
+            <input value={personal.website} onChange={e => setPersonal({...personal, website: e.target.value})} placeholder="Website" className="w-full p-3 rounded-xl border" />
+            <input value={personal.address} onChange={e => setPersonal({...personal, address: e.target.value})} placeholder="Address" className="w-full p-3 rounded-xl border" />
+          </div>
         </div>
 
-        <div className="space-y-6">
-          <SettingsPanel
-            icon={Bell}
-            title="Notifications"
-            description="Choose the alerts you want to receive."
-          >
-            <div className="grid gap-3">
-              {[
-                ["email", "Email alerts"],
-                ["sms", "SMS alerts"],
-                ["approvals", "Approval updates"],
-                ["messages", "Admin messages"],
-                ["productUpdates", "Product updates"],
-                ["marketing", "Marketing emails"],
-              ].map(([key, label]) => (
-                <ToggleRow
-                  key={key}
-                  label={label}
-                  checked={notifications[key]}
-                  onChange={() =>
-                    setNotifications((current) => ({ ...current, [key]: !current[key] }))
-                  }
-                />
-              ))}
-            </div>
-          </SettingsPanel>
+        {/* Security */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200">
+          <h2 className="text-xl font-black mb-4">Security</h2>
+          <div className="space-y-4">
+            <input type="password" value={security.currentPassword} onChange={e => setSecurity({...security, currentPassword: e.target.value})} placeholder="Current Password" className="w-full p-3 rounded-xl border" />
+            <input type="password" value={security.newPassword} onChange={e => setSecurity({...security, newPassword: e.target.value})} placeholder="New Password" className="w-full p-3 rounded-xl border" />
+            <input type="password" value={security.confirmPassword} onChange={e => setSecurity({...security, confirmPassword: e.target.value})} placeholder="Confirm Password" className="w-full p-3 rounded-xl border" />
+            <button onClick={handleChangePassword} className="w-full p-3 rounded-xl bg-slate-900 text-white">Change Password</button>
+          </div>
+        </div>
 
-          <SettingsPanel
-            icon={Globe2}
-            title="Regional preferences"
-            description="Set formats used across your estimates and documents."
-          >
-            <div className="grid gap-4">
-              <SelectField
-                label="Currency"
-                value={regional.currency}
-                options={currencyOptions}
-                onChange={(value) => setRegional((current) => ({ ...current, currency: value }))}
-              />
-              <SelectField
-                label="Timezone"
-                value={regional.timezone}
-                options={timezoneOptions}
-                onChange={(value) => setRegional((current) => ({ ...current, timezone: value }))}
-              />
-              <SelectField
-                label="Language"
-                value={regional.language}
-                options={languageOptions}
-                onChange={(value) => setRegional((current) => ({ ...current, language: value }))}
-              />
-              <SelectField
-                label="Date Format"
-                value={regional.dateFormat}
-                options={dateFormats}
-                onChange={(value) => setRegional((current) => ({ ...current, dateFormat: value }))}
-              />
-            </div>
-          </SettingsPanel>
+        {/* Notifications */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200">
+          <h2 className="text-xl font-black mb-4">Notifications</h2>
+          <div className="space-y-3">
+            {Object.entries(notifications).map(([key, value]) => (
+              <label key={key} className="flex justify-between items-center p-3 rounded-xl border cursor-pointer">
+                <span>{key.charAt(0).toUpperCase() + key.slice(1)}</span>
+                <input type="checkbox" checked={value} onChange={() => setNotifications({...notifications, [key]: !value})} className="w-5 h-5" />
+              </label>
+            ))}
+          </div>
+        </div>
 
-          <SettingsPanel
-            icon={CheckCircle2}
-            title="Estimate preferences"
-            description="Tune defaults for new client estimations."
-          >
-            <div className="grid gap-3">
-              <TextField
-                label="Default Project Type"
-                value={preferences.defaultProjectType}
-                onChange={(value) =>
-                  setPreferences((current) => ({ ...current, defaultProjectType: value }))
-                }
-              />
-              <TextField
-                label="Default Tech Stack"
-                value={preferences.defaultTechStack}
-                onChange={(value) =>
-                  setPreferences((current) => ({ ...current, defaultTechStack: value }))
-                }
-              />
-              <ToggleRow
-                label="Auto-save estimates"
-                checked={preferences.autoSave}
-                onChange={() =>
-                  setPreferences((current) => ({ ...current, autoSave: !current.autoSave }))
-                }
-              />
-              <ToggleRow
-                label="Auto-generate PDF"
-                checked={preferences.autoGeneratePDF}
-                onChange={() =>
-                  setPreferences((current) => ({
-                    ...current,
-                    autoGeneratePDF: !current.autoGeneratePDF,
-                  }))
-                }
-              />
-            </div>
-          </SettingsPanel>
+        {/* Regional */}
+        <div className="bg-white p-6 rounded-2xl border border-slate-200">
+          <h2 className="text-xl font-black mb-4">Regional Settings</h2>
+          <div className="space-y-4">
+            <select value={regional.currency} onChange={e => setRegional({...regional, currency: e.target.value})} className="w-full p-3 rounded-xl border">
+              {currencyOptions.map(opt => <option key={opt}>{opt}</option>)}
+            </select>
+            <select value={regional.timezone} onChange={e => setRegional({...regional, timezone: e.target.value})} className="w-full p-3 rounded-xl border">
+              {timezoneOptions.map(opt => <option key={opt}>{opt}</option>)}
+            </select>
+            <select value={regional.language} onChange={e => setRegional({...regional, language: e.target.value})} className="w-full p-3 rounded-xl border">
+              {languageOptions.map(opt => <option key={opt}>{opt}</option>)}
+            </select>
+          </div>
         </div>
       </div>
     </ClientHubLayout>
-  );
-}
-
-// Helper Components (same as before)
-function SettingsPanel({ icon: Icon, title, description, children }) {
-  return (
-    <section className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="flex items-start gap-4">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-3xl bg-slate-900 text-white">
-          <Icon className="h-5 w-5" />
-        </div>
-        <div>
-          <h2 className="text-xl font-black tracking-tight text-slate-950">{title}</h2>
-          <p className="mt-1 text-sm text-slate-500">{description}</p>
-        </div>
-      </div>
-      <div className="mt-6">{children}</div>
-    </section>
-  );
-}
-
-function PasswordInput({ label, value, onChange, placeholder }) {
-  return (
-    <label className="block rounded-[24px] border border-slate-200 bg-slate-50 p-4">
-      <span className="text-sm font-semibold text-slate-700">{label}</span>
-      <input
-        type="password"
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        className="mt-3 w-full bg-transparent text-sm text-slate-900 outline-none"
-      />
-    </label>
-  );
-}
-
-function SelectField({ label, value, options, onChange }) {
-  return (
-    <label className="block rounded-[24px] border border-slate-200 bg-slate-50 p-4">
-      <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-        {label}
-      </span>
-      <select
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="mt-3 w-full bg-transparent text-sm font-semibold text-slate-900 outline-none"
-      >
-        {options.map((option) => (
-          <option key={option}>{option}</option>
-        ))}
-      </select>
-    </label>
-  );
-}
-
-function TextField({ label, value, onChange }) {
-  return (
-    <label className="block rounded-[24px] border border-slate-200 bg-slate-50 p-4">
-      <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-        {label}
-      </span>
-      <input
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="mt-3 w-full bg-transparent text-sm font-semibold text-slate-900 outline-none"
-      />
-    </label>
-  );
-}
-
-function ToggleRow({ label, description, checked, onChange }) {
-  return (
-    <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <p className="text-sm font-semibold text-slate-700">{label}</p>
-          {description && <p className="text-sm text-slate-500">{description}</p>}
-        </div>
-        <button
-          type="button"
-          onClick={onChange}
-          className={`h-11 w-20 rounded-full transition ${
-            checked ? "bg-slate-900" : "bg-slate-300"
-          }`}
-          aria-pressed={checked}
-        >
-          <span
-            className={`block h-9 w-9 rounded-full bg-white transition ${
-              checked ? "translate-x-10" : "translate-x-1"
-            }`}
-          />
-        </button>
-      </div>
-    </div>
   );
 }

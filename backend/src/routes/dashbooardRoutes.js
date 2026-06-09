@@ -1,12 +1,9 @@
 import express from "express";
-import { 
-  getDashboardOverview,
-  getClientDashboard  // Make sure this is imported
-} from "../controllers/dashboardController.js";
+import { getDashboardOverview, getClientDashboard } from "../controllers/dashboardController.js";
 
 const router = express.Router();
 
 router.get("/overview", getDashboardOverview);
-router.get("/client/:clientId", getClientDashboard);  // This route must exist
+router.get("/client/:clientId", getClientDashboard);
 
 export default router;

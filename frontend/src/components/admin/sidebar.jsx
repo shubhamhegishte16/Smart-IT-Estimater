@@ -1,7 +1,10 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { LogOut } from "lucide-react";
 import beaconLogo from "../../assets/beacon-logo.png";
+
 function Sidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Helper to determine active route styling
   const isActive = (path) => location.pathname === path;
@@ -12,6 +15,21 @@ function Sidebar() {
         ? "bg-black text-white shadow-sm"
         : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
     }`;
+  };
+
+  const handleLogout = () => {
+    // Clear all user data from localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userCompany");
+    localStorage.removeItem("userPhone");
+    localStorage.removeItem("adminSettings");
+    localStorage.removeItem("clientSettings");
+    
+    // Navigate to login page
+    navigate("/login");
   };
 
   return (
@@ -35,7 +53,7 @@ function Sidebar() {
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex flex-col gap-1.5">
+      <nav className="flex flex-col gap-1.5 flex-1">
         
         <Link className={linkStyle("/admin/dashboard")} to="/admin/dashboard">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -88,6 +106,17 @@ function Sidebar() {
         </Link>
 
       </nav>
+
+      {/* Logout Button - at the bottom */}
+      <div className="mt-auto pt-6 border-t border-gray-200">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 w-full text-red-600 hover:bg-red-50 hover:text-red-700"
+        >
+          <LogOut size={18} />
+          Logout
+        </button>
+      </div>
     </aside>
   );
 }

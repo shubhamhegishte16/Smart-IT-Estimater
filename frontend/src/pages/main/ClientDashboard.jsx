@@ -232,13 +232,13 @@ function ClientDashboard() {
             </div>
           </div>
 
-          <button 
+          {/* <button 
             onClick={handleDownloadReport}
             className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
           >
             <Download size={17} />
             Download latest report
-          </button>
+          </button> */}
         </div>
       </section>
     </ClientHubLayout>

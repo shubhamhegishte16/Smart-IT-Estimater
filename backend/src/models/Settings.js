@@ -1,87 +1,43 @@
-// models/Settings.js
 import mongoose from "mongoose";
 
 const settingsSchema = new mongoose.Schema({
-    companyName: {
+    userEmail: {
         type: String,
-        default: ""
+        required: true,
+        unique: true
     },
-    companyEmail: {
-        type: String,
-        default: ""
+    personal: {
+        fullName: String,
+        company: String,
+        email: String,
+        phone: String,
+        website: String,
+        industry: String,
+        address: String,
     },
-    companyPhone: {
-        type: String,
-        default: ""
+    notifications: {
+        email: { type: Boolean, default: true },
+        sms: { type: Boolean, default: false },
+        approvals: { type: Boolean, default: true },
+        messages: { type: Boolean, default: true },
+        productUpdates: { type: Boolean, default: true },
+        marketing: { type: Boolean, default: false }
     },
-    companyAddress: {
-        type: String,
-        default: ""
+    regional: {
+        currency: { type: String, default: "USD" },
+        timezone: { type: String, default: "UTC +5:30" },
+        language: { type: String, default: "English" },
+        dateFormat: { type: String, default: "DD/MM/YYYY" }
     },
-    currency: {
-        type: String,
-        enum: ["INR", "USD", "EUR", "GBP"],
-        default: "INR"
+    preferences: {
+        defaultProjectType: { type: String, default: "" },
+        defaultTechStack: { type: String, default: "" },
+        autoSave: { type: Boolean, default: true },
+        autoGeneratePDF: { type: Boolean, default: false }
     },
-    currencySymbol: {
-        type: String,
-        default: "₹"
-    },
-    quotationPrefix: {
-        type: String,
-        default: "EST"
-    },
-    lowComplexityLimit: {
-        type: Number,
-        default: 50000
-    },
-    mediumComplexityLimit: {
-        type: Number,
-        default: 100000
-    },
-    highComplexityLimit: {
-        type: Number,
-        default: 200000
-    },
-    taxRate: {
-        type: Number,
-        default: 18
-    },
-    enableTax: {
-        type: Boolean,
-        default: true
-    },
-    enableNotifications: {
-        type: Boolean,
-        default: true
-    },
-    smtpHost: {
-        type: String,
-        default: ""
-    },
-    smtpPort: {
-        type: Number,
-        default: 587
-    },
-    smtpUser: {
-        type: String,
-        default: ""
-    },
-    smtpPass: {
-        type: String,
-        default: ""
-    }
+    twoFactor: { type: Boolean, default: false }
 }, {
     timestamps: true
 });
 
-// Singleton pattern - only one settings document
-settingsSchema.statics.getInstance = async function() {
-    let settings = await this.findOne();
-    if (!settings) {
-        settings = await this.create({});
-    }
-    return settings;
-};
-
-export default mongoose.model("Settings", settingsSchema, "Settings");
+export default mongoose.model("Settings", settingsSchema);

@@ -2,9 +2,8 @@ import Feature from "../models/Feature.js";
 import ProjectType from "../models/ProjectType.js";
 import Estimation from "../models/Estimation.js";
 import User from "../models/User.js";
-import mongoose from "mongoose";
 
-// Admin dashboard - Already exists
+// Admin dashboard overview
 export const getDashboardOverview = async (req, res) => {
     try {
         const totalFeatures = await Feature.countDocuments();
@@ -24,74 +23,80 @@ export const getDashboardOverview = async (req, res) => {
     }
 };
 
-// Client dashboard - ADD THIS IF MISSING
+// Client dashboard
 export const getClientDashboard = async (req, res) => {
     try {
         const { clientId } = req.params;
-        
-        console.log("Searching for client:", clientId);
-        
-        // Decode email if it's URL encoded
         const decodedClientId = decodeURIComponent(clientId);
         
-        // Find user by email (since you're passing email)
-        const client = await User.findOne({ 
-            email: decodedClientId 
-        });
+        console.log("Fetching dashboard for client:", decodedClientId);
+        
+        // Find user by email
+        let client = await User.findOne({ email: decodedClientId });
+        
+        // If not found by email, try by ID
+        if (!client && clientId.match(/^[0-9a-fA-F]{24}$/)) {
+            client = await User.findById(clientId);
+        }
         
         if (!client) {
             return res.status(404).json({ 
-                success: false,
-                message: `Client not found with email: ${decodedClientId}`
+                success: false, 
+                message: "Client not found" 
             });
         }
         
-        console.log("Found client:", client.email);
-        
-        // Get estimations for this client
+        // Get all estimations for this client
         const estimations = await Estimation.find({ 
             clientEmail: client.email 
-        }).populate('projectType', 'name').populate('features', 'name');
+        }).populate('projectType', 'name').populate('features', 'name').sort({ createdAt: -1 });
         
-        console.log(`Found ${estimations.length} estimations`);
+        console.log(`Found ${estimations.length} estimations for ${client.email}`);
         
         // Calculate metrics
         const activeEstimates = estimations.length;
         const approvedProjects = estimations.filter(e => e.status === "approved").length;
-        const totalDays = estimations.reduce((sum, est) => sum + (est.totalDays || 0), 0);
-        const averageTimeline = estimations.length > 0 ? Math.round(totalDays / estimations.length) : 0;
-        const totalBudget = estimations.reduce((sum, est) => sum + (est.totalCost || 0), 0);
         
-        // Transform to frontend format
+        // Calculate average timeline
+        const totalDays = estimations.reduce((sum, est) => sum + (est.totalDays || 0), 0);
+        const avgDays = estimations.length > 0 ? Math.round(totalDays / estimations.length) : 0;
+        const averageTimeline = avgDays > 0 ? `${avgDays} days` : "N/A";
+        
+        // Calculate total budget
+        const totalBudget = estimations.reduce((sum, est) => sum + (est.totalCost || 0), 0);
+        const estimatedBudget = `₹${totalBudget.toLocaleString('en-IN')}`;
+        
+        // Transform to active projects format
         const activeProjects = estimations.map(est => ({
             name: est.clientName || "Project",
             type: est.projectType?.name || "General",
             stage: est.complexity || "In Progress",
             due: est.totalDays ? `${est.totalDays} days` : "TBD",
-            progress: 0
+            progress: Math.floor(Math.random() * 60) + 20 // Demo progress
         }));
         
-        // Next actions
-        const nextActions = estimations.length === 0 ? [
-            "🚀 Create your first estimate to get started",
-            "📋 Browse available features", 
-            "💬 Contact support for assistance"
-        ] : [
-            `📊 Review ${estimations.length} active estimate(s)`,
-            "✨ Submit new project requirements",
-            "📞 Schedule a consultation call"
-        ];
+        // Generate next actions based on actual data
+        const nextActions = [];
+        if (estimations.length === 0) {
+            nextActions.push("🚀 Create your first estimate to get started");
+            nextActions.push("📋 Browse available features");
+            nextActions.push("💬 Contact support for assistance");
+        } else {
+            nextActions.push(`📊 Review ${estimations.length} active estimate(s)`);
+            nextActions.push(`💰 Total investment: ${estimatedBudget}`);
+            nextActions.push("✨ Submit new project requirements");
+        }
         
-        // Recent activity
+        // Generate recent activity
         const activity = estimations.slice(0, 5).map(est => ({
             time: getTimeAgo(est.createdAt),
-            text: `Created estimate for "${est.clientName || 'project'}" - ${est.complexity || 'Standard'} complexity`
+            text: `Created estimate for "${est.clientName || 'project'}" - ${est.complexity || 'Standard'} complexity (${estimatedBudget})`
         }));
         
         if (activity.length === 0) {
             activity.push({
                 time: "Just now",
-                text: "Welcome to your dashboard! Create your first estimate to see activity here."
+                text: "Welcome to your dashboard! Create your first estimate to get started."
             });
         }
         
@@ -100,8 +105,8 @@ export const getClientDashboard = async (req, res) => {
             metrics: {
                 activeEstimates,
                 approvedProjects,
-                averageTimeline: averageTimeline > 0 ? `${averageTimeline} days` : "N/A",
-                estimatedBudget: `₹${totalBudget.toLocaleString()}`
+                averageTimeline,
+                estimatedBudget
             },
             activeProjects,
             nextActions,
@@ -111,7 +116,7 @@ export const getClientDashboard = async (req, res) => {
     } catch (error) {
         console.error("Client dashboard error:", error);
         res.status(500).json({ 
-            success: false,
+            success: false, 
             message: error.message 
         });
     }
@@ -120,7 +125,9 @@ export const getClientDashboard = async (req, res) => {
 // Helper function
 function getTimeAgo(date) {
     if (!date) return "Recently";
+    
     const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+    
     if (seconds < 60) return "Just now";
     const minutes = Math.floor(seconds / 60);
     if (minutes < 60) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
