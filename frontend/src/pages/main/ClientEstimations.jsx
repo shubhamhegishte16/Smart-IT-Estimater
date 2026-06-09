@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Download, Eye, Search, X } from "lucide-react";
 import ClientHubLayout from "../../components/main/ClientHubLayout";
+import { API_BASE_URL } from "../../services/api";
 import { getEstimationsByClient } from "../../services/estimationService";
 
 const statusStyles = {
@@ -32,7 +33,7 @@ function ClientEstimations() {
       if (downloadBtn) downloadBtn.disabled = true;
 
       // Fetch complete estimation data with populated fields
-      const response = await fetch(`http://localhost:5000/api/estimations/${estimate._id}`);
+      const response = await fetch(`${API_BASE_URL}/estimations/${estimate._id}`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch estimate data");

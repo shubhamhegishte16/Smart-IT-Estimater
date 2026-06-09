@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import ClientHubLayout from "../../components/main/ClientHubLayout";
+import { API_BASE_URL } from "../../services/api";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -54,7 +55,7 @@ export default function Downloads() {
         userEmail = localStorage.getItem("userEmail") || "shubham@example.com";
       }
 
-      const response = await fetch(`http://localhost:5000/api/estimations/client/${encodeURIComponent(userEmail)}`, {
+      const response = await fetch(`${API_BASE_URL}/estimations/client/${encodeURIComponent(userEmail)}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
@@ -160,7 +161,7 @@ export default function Downloads() {
       console.log("Downloading document:", item.name);
       
       // Fetch complete estimation data
-      const response = await fetch(`http://localhost:5000/api/estimations/${item.originalData._id}`);
+      const response = await fetch(`${API_BASE_URL}/estimations/${item.originalData._id}`);
       
       if (!response.ok) {
         throw new Error("Failed to fetch estimate data");

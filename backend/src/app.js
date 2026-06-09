@@ -13,9 +13,22 @@ dotenv.config();
 
 const app = express();
 
+const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: "http://localhost:5173"
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error(`CORS blocked origin: ${origin}`));
+    },
+    credentials: true,
   })
 );
 app.use(express.json());
@@ -26,8 +39,15 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/estimations", estimationRoutes);
 app.use("/api/settings", settingsRoutes);
-app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Backend healthy",
+    uptime: process.uptime(),
+  });
+});
 
 app.get("/", (req, res) => {
   res.send("Backend Running Successfully");

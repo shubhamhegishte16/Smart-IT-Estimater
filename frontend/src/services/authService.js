@@ -1,5 +1,5 @@
 // services/authService.js
-const API_BASE_URL = "http://localhost:5000/api";
+import { API_BASE_URL } from "./api";
 
 export const registerUser = async (name, email, password, role, company, phone) => {
     try {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AdminLayout from "../../components/admin/AdminLayout";
-import StatCard from "../../components/admin/StatCard";
+import StatCard from "../../components/admin/statcard";
 import * as FeatureService from "../../services/featureService.js";
 
 console.log("FeatureService:", FeatureService);

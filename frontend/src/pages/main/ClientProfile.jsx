@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Building2, Mail, Phone, MapPin, Globe, CreditCard, Bell, Eye, Edit2, Save, X } from "lucide-react";
+import { API_BASE_URL } from "../../services/api";
 
 const sidebarItems = [
   { label: "Dashboard", path: "/client/dashboard" },
@@ -72,7 +73,7 @@ export default function ClientProfile() {
         userEmail = localStorage.getItem("userEmail") || "shubham@example.com";
       }
       
-      const response = await fetch(`http://localhost:5000/api/users/profile/${encodeURIComponent(userEmail)}`, {
+      const response = await fetch(`${API_BASE_URL}/users/profile/${encodeURIComponent(userEmail)}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       });
@@ -120,7 +121,7 @@ export default function ClientProfile() {
         userEmail = localStorage.getItem("userEmail") || "shubham@example.com";
       }
       
-      const response = await fetch(`http://localhost:5000/api/estimations/client/${encodeURIComponent(userEmail)}`, {
+      const response = await fetch(`${API_BASE_URL}/estimations/client/${encodeURIComponent(userEmail)}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       });
@@ -196,7 +197,7 @@ export default function ClientProfile() {
     setMessage(null);
     
     try {
-      const response = await fetch(`http://localhost:5000/api/users/profile/${encodeURIComponent(profile.email)}`, {
+      const response = await fetch(`${API_BASE_URL}/users/profile/${encodeURIComponent(profile.email)}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -261,7 +262,7 @@ export default function ClientProfile() {
         } catch (e) {}
       }
       
-      const response = await fetch(`http://localhost:5000/api/users/change-password`, {
+      const response = await fetch(`${API_BASE_URL}/users/change-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

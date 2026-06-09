@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/api/auth";
+gconst API_URL = `${process.env.API_BASE_URL || "http://localhost:5000/api"}/auth`;
 
 export const loginUser = async (email, password) => {
   const response = await fetch(`${API_URL}/login`, {

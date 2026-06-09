@@ -12,6 +12,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import ClientHubLayout from "../../components/main/ClientHubLayout";
+import { API_BASE_URL } from "../../services/api";
 
 function ClientDashboard() {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ function ClientDashboard() {
     
     console.log("Fetching dashboard for logged-in user:", finalEmail);
     
-    fetch(`http://localhost:5000/api/dashboard/client/${encodeURIComponent(finalEmail)}`, {
+    fetch(`${API_BASE_URL}/dashboard/client/${encodeURIComponent(finalEmail)}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })
