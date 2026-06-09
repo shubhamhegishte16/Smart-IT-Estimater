@@ -13,7 +13,10 @@ dotenv.config();
 
 const app = express();
 
-const allowedOrigins = (process.env.CLIENT_ORIGIN || "http://localhost:5173")
+const allowedOrigins = (
+  process.env.CLIENT_ORIGIN ||
+  "http://localhost:5173,https://beacon-smart-estimation.vercel.app"
+)
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);

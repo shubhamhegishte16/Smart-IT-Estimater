@@ -12,7 +12,7 @@ Create a new Render Web Service from this repository.
 Set these Render environment variables:
 
 - `MONGO_URI`: your MongoDB Atlas connection string
-- `CLIENT_ORIGIN`: your frontend URL, for example `https://your-app.vercel.app`
+- `CLIENT_ORIGIN`: `https://beacon-smart-estimation.vercel.app`
 - `NODE_ENV`: `production`
 
 You can also use the root `render.yaml` as a Render blueprint.
@@ -27,7 +27,7 @@ Import the repository in Vercel.
 
 Set this Vercel environment variable:
 
-- `VITE_API_BASE_URL`: your Render backend API URL, for example `https://your-backend.onrender.com/api`
+- `VITE_API_BASE_URL`: `https://smart-it-estimater.onrender.com/api`
 
 ## Frontend on Netlify
 
@@ -39,6 +39,6 @@ Import the repository in Netlify.
 
 Set this Netlify environment variable:
 
-- `VITE_API_BASE_URL`: your Render backend API URL, for example `https://your-backend.onrender.com/api`
+- `VITE_API_BASE_URL`: `https://smart-it-estimater.onrender.com/api`
 
 After frontend deployment, update the Render `CLIENT_ORIGIN` value to the final Vercel or Netlify URL.
