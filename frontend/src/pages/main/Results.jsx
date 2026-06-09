@@ -112,26 +112,20 @@ function Results() {
 
                     {/* Actions */}
                     <div className="px-8 py-6 flex gap-4">
-                        <button
-                            onClick={handleDownload}
-                            className="flex-1 h-12 rounded-xl bg-black text-white font-semibold flex items-center justify-center gap-2 hover:bg-gray-800"
-                        >
-                            <Download size={18} />
-                            Download PDF
-                        </button>
+                       
                         <button
                             onClick={handlePrint}
                             className="flex-1 h-12 rounded-xl border border-gray-300 font-semibold flex items-center justify-center gap-2 hover:bg-gray-50"
                         >
                             <Printer size={18} />
-                            Print
+                            Download PDF
                         </button>
                         <button
-                            onClick={() => navigate("/estimations")}
+                            onClick={() => navigate("/clientprofile")}
                             className="flex-1 h-12 rounded-xl border border-gray-300 font-semibold flex items-center justify-center gap-2 hover:bg-gray-50"
                         >
                             <Home size={18} />
-                            New Estimate
+                            View Profile
                         </button>
                     </div>
                 </div>

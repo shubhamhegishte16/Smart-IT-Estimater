@@ -120,3 +120,24 @@ export const generateEstimationReport = async (id, format = "pdf") => {
         throw error;
     }
 };
+export const getEstimationsByClient = async (email) => {
+    try {
+        const response = await fetch(
+            `${API_BASE_URL}/estimations/client/${encodeURIComponent(email)}`,
+            {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+            }
+        );
+
+        if (!response.ok)
+            throw new Error("Failed to fetch client estimations");
+
+        const data = await response.json();
+
+        return data.estimations || [];
+    } catch (error) {
+        console.error("Error fetching client estimations:", error);
+        throw error;
+    }
+};

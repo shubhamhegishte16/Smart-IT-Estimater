@@ -426,7 +426,7 @@ export default function Downloads() {
           ))}
         </section>
 
-        <section className="grid gap-6 xl:grid-cols-[1.6fr_0.9fr]">
+        <section className="w-full">
           <div className="space-y-6 rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
@@ -532,52 +532,7 @@ export default function Downloads() {
             </div>
           </div>
 
-          <div className="space-y-6">
-            <div className="rounded-[32px] border border-slate-200 bg-slate-50 p-6 shadow-sm">
-              <h2 className="text-xl font-black tracking-tight text-slate-950">Export center</h2>
-              <p className="mt-2 text-sm text-slate-600">Create offline copies of your documents in the format you need.</p>
-
-              <div className="mt-6 grid gap-3">
-                {exportButtons.map((item) => (
-                  <button
-                    key={item.label}
-                    onClick={() => handleExport(item.format)}
-                    className={`${item.color} inline-flex h-12 w-full items-center justify-between rounded-2xl px-4 text-sm font-semibold transition hover:opacity-95`}
-                  >
-                    <span>{item.label}</span>
-                    <item.icon className="h-4 w-4" />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <h3 className="text-lg font-black tracking-tight text-slate-950">Storage usage</h3>
-                  <p className="mt-1 text-sm text-slate-500">{storageInfo.used} GB used of {storageInfo.total} GB</p>
-                </div>
-                <div className="rounded-3xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">
-                  {storageInfo.percentage}% used
-                </div>
-              </div>
-
-              <div className="mt-6 h-3 overflow-hidden rounded-full bg-slate-100">
-                <div className="h-full rounded-full bg-gradient-to-r from-slate-900 to-slate-500" style={{ width: `${storageInfo.percentage}%` }} />
-              </div>
-
-              <div className="mt-6 grid gap-3 rounded-[24px] border border-slate-200 bg-slate-50 p-4">
-                <div className="flex items-center justify-between text-sm text-slate-600">
-                  <span>Documents</span>
-                  <span>{downloads.length} files</span>
-                </div>
-                <div className="flex items-center justify-between text-sm text-slate-600">
-                  <span>Remaining storage</span>
-                  <span>{storageInfo.total - storageInfo.used} GB</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          
         </section>
 
         <section className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
@@ -585,14 +540,19 @@ export default function Downloads() {
             <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h2 className="text-xl font-black tracking-tight text-slate-950">Recent downloads</h2>
+                  <h2 className="text-xl font-black tracking-tight text-slate-950">
+  Download Insights
+</h2>
                   <p className="mt-1 text-sm text-slate-500">Quick access to your most recent files.</p>
                 </div>
               </div>
 
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 {recentDownloads.map((file) => (
-                  <div key={file.id} className="rounded-[28px] border border-slate-200 bg-slate-50 p-5 shadow-sm">
+                  <div
+  key={file.id}
+  className="group rounded-[28px] border border-slate-200 bg-slate-50 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-slate-400 cursor-pointer"
+>
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex h-12 w-12 items-center justify-center rounded-3xl bg-slate-900 text-white">
                         <FileText className="h-5 w-5" />

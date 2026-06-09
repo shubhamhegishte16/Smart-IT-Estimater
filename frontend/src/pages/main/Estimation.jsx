@@ -150,11 +150,15 @@ function Estimation() {
 
     try {
       const savedEstimate = await createEstimation({
-        clientName: client.clientName,
-        clientEmail: client.clientEmail,
-        projectTypeId: selectedProjectType._id,
-        featureIds: selectedFeatures,
-      });
+  clientName: client.clientName,
+  clientEmail: client.clientEmail,
+  projectTypeId: selectedProjectType._id,
+  featureIds: selectedFeatures,
+
+  totalCost: estimate.cost,
+  totalDays: estimate.days,
+  complexity: estimate.complexity,
+});
 
       navigate("/results", {
         state: {
